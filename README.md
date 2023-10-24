@@ -14,7 +14,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/noworneverev/react-vscode-portfolio">
+  <a href="https://github.com/stxgao/react-vscode-portfolio">
     <img src="./src/static/logo.svg" alt="Logo" width="80" >
   </a>
 
@@ -23,14 +23,14 @@
   <p align="center">
     A vscode inspired portfolio project
     <br />
-    <a href="https://github.com/noworneverev/react-vscode-portfolio/blob/main/README.md"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/stxgao/react-vscode-portfolio/blob/main/README.md"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://noworneverev.github.io/">View Demo</a>
+    <a href="https://stxgao.github.io/">View Demo</a>
     ·
-    <a href="https://noworneverev.github.io/#/docs">Markdown prview</a>
+    <a href="https://stxgao.github.io/#/docs">Markdown preview</a>
     ·
-    <a href="https://github.com/noworneverev/react-vscode-portfolio/issues">Report Bug</a>
+    <a href="https://github.com/stxgao/react-vscode-portfolio/issues">Report Bug</a>
   </p>
 </div>
 
@@ -65,7 +65,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://noworneverev.github.io/)
+[![Product Name Screen Shot][screenshot]](https://stxgao.github.io/)
 
 The project is inspired by [Visual Studio Code](https://github.com/microsoft/vscode) and [caglarturali.github.io](https://github.com/caglarturali/caglarturali.github.io). The pages of the portfolio are powered by `markdown`, which make them easy to modify or add your own contents.
 
@@ -85,11 +85,11 @@ The project is inspired by [Visual Studio Code](https://github.com/microsoft/vsc
 
 ### Installation
 
-1. Clone the repo
+1. Clone or fork the repo
    ```sh
-   git clone https://github.com/noworneverev/react-vscode-portfolio.git
+   git clone https://github.com/stxgao/react-vscode-portfolio.git
    ```
-2. Install NPM packages
+2. Install npm packages
    ```sh
    npm install
    ```
@@ -98,43 +98,40 @@ The project is inspired by [Visual Studio Code](https://github.com/microsoft/vsc
    REACT_APP_NAME=<your_name>
    ```
 4. Add your markdown pages in `public/pages`
-5. Add your routes in `src/app/pages/page.ts`, make sure the names of pages are consistent with markdown files.
+5. Add your routes in `src/app/pages/page.ts`, make sure the names of the pages are consistent with the markdown files.
     ```ts
     export const pages = [
-      { index: 0, name: 'overview.md', route: '/overview' },
-      { index: 1, name: 'skills.md', route: '/skills' },
-      { index: 2, name: 'experience.md', route: '/experience' },
-      { index: 3, name: 'education.md', route: '/education' },
-      { index: 4, name: 'projects.md', route: '/projects' },  
-      { index: 5, name: 'certificates.md', route: '/certificates' },
-      { index: 6, name: 'accomplishments.md', route: '/accomplishments' },
+      { index: 0, name: 'steven-gao.md', route: '/overview', visible: true },
+      { index: 1, name: 'skills.md', route: '/skills', visible: true },
+      { index: 2, name: 'experience.md', route: '/experience', visible: true },
+      { index: 3, name: 'education.md', route: '/education', visible: true },
+      { index: 4, name: 'projects.md', route: '/projects', visible: true },
+      { index: 5, name: 'contact.md', route: '/contact', visible: true },
+      { index: 6, name: 'docs.md', route: '/docs', visible: false },  
     ];
     ```
-6. Add your social links in `src/app/pages/link.tsx`, which will appear in both sidebar and homepage.
+6. Add your social links in `src/app/pages/links.tsx`, which will appear in both the sidebar and homepage.
     ```ts
     export const links = [
       {
         index: 0,
         title: "Find me on Github",
-        href: "https://github.com/noworneverev",
+        href: "https://github.com/stxgao",
         icon: <FaGithub />,
       },
     ];
     ```
-7. Runs the app in the development mode
+7. Serve the app locally
    ```sh
    npm start
    ```   
 8. Deploy your own portfolio,  
    - modify homepage property in `package.json` 
    ```
-   "homepage": "https://{username}.github.io/{repo-name}"
+   "homepage": "https://{username}.github.io/"
    ```
-   > \* For a [project site](https://pages.github.com/#project-site), that's the format. For a [user site](https://pages.github.com/#user-site), the format is: `https://{username}.github.io`. You can read more about the `homepage` property in the ["GitHub Pages" section](https://create-react-app.dev/docs/deployment/#github-pages) of the `create-react-app` documentation.   
-  
 
-
-   - modify Google Analytic measurement id in `.env.production`
+   - modify Google Analytics measurement id in `.env.production`
    ```
    REACT_APP_NAME=<your_name>
    REACT_APP_MEASUREMENT_ID=<your_measurement_id>   
@@ -149,9 +146,10 @@ docker-compose up
 
 ## Demonstration
 
-- The project is deployed to following two domains, and they are in synchronization.
-  - user site: [https://noworneverev.github.io/](https://noworneverev.github.io/)
-  - project site: [https://noworneverev.github.io/react-vscode-portfolio/](https://noworneverev.github.io/react-vscode-portfolio/)
+- The project is deployed to the following domains, and they are in synchronization.
+  - stevengao.dev
+  - user site: [https://stxgao.github.io/](https://stxgao.github.io/)
+  - project site: [https://stxgao.github.io/react-vscode-portfolio/](https://stxgao.github.io/react-vscode-portfolio/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -163,13 +161,13 @@ docker-compose up
   - Syntax highlight
   - Alert
 - Dark mode and light mode available
-- Closable tabs
+- Closeable tabs
 - Collapsible explorer
 - Responsive web design
 - Google Analytics supported
-- Auto-deploy to gh-pages with github actions ready
+- Auto-deploy to gh-pages and github actions ready
 
-Markdown preview: https://noworneverev.github.io/#/docs
+Markdown preview: https://stxgao.github.io/#/docs
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -185,9 +183,9 @@ Distributed under the MIT License. See `LICENSE.md` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Yan-Ying Liao - [Personal Portfolio](https://noworneverev.github.io/) - n9102125@gmail.com
+Steven Gao - [Personal Portfolio](https://stxgao.github.io/) - steven@stevengao.dev
 
-Project Link: [https://github.com/noworneverev/react-vscode-portfolio](https://github.com/noworneverev/react-vscode-portfolio)
+Project Link: [https://github.com/stxgao/react-vscode-portfolio](https://github.com/stxgao/react-vscode-portfolio)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -205,18 +203,18 @@ Project Link: [https://github.com/noworneverev/react-vscode-portfolio](https://g
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[forks-shield]: https://img.shields.io/github/forks/noworneverev/react-vscode-portfolio
-[forks-url]: https://github.com/noworneverev/react-vscode-portfolio/network/members
-[stars-shield]: https://img.shields.io/github/stars/noworneverev/react-vscode-portfolio
-[stars-url]: https://github.com/noworneverev/react-vscode-portfolio/stargazers
-[issues-shield]: https://img.shields.io/github/issues/noworneverev/react-vscode-portfolio
-[issues-url]: https://github.com/noworneverev/react-vscode-portfolio/issues
-[license-shield]: https://img.shields.io/github/license/noworneverev/react-vscode-portfolio
-[license-url]: https://github.com/noworneverev/react-vscode-portfolio/blob/master/LICENSE.md
+[forks-shield]: https://img.shields.io/github/forks/stxgao/react-vscode-portfolio
+[forks-url]: https://github.com/stxgao/react-vscode-portfolio/network/members
+[stars-shield]: https://img.shields.io/github/stars/stxgao/react-vscode-portfolio
+[stars-url]: https://github.com/stxgao/react-vscode-portfolio/stargazers
+[issues-shield]: https://img.shields.io/github/issues/stxgao/react-vscode-portfolio
+[issues-url]: https://github.com/stxgao/react-vscode-portfolio/issues
+[license-shield]: https://img.shields.io/github/license/stxgao/react-vscode-portfolio
+[license-url]: https://github.com/stxgao/react-vscode-portfolio/blob/master/LICENSE.md
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/yan-ying-liao/
 [product-screenshot]: ./src/static/screenshot.gif
-[gh-pages-shield]: https://img.shields.io/github/deployments/noworneverev/noworneverev.github.io/github-pages
-[gh-pages-url]: https://github.com/noworneverev/noworneverev.github.io/deployments
-[website-shield]:https://img.shields.io/website?url=https%3A%2F%2Fnoworneverev.github.io%2F
-[website-url]: https://noworneverev.github.io/
+[gh-pages-shield]: https://img.shields.io/github/deployments/stxgao/stxgao.github.io/github-pages
+[gh-pages-url]: https://github.com/stxgao/stxgao.github.io/deployments
+[website-shield]:https://img.shields.io/website?url=https%3A%2F%2Fstxgao.github.io%2F
+[website-url]: https://stxgao.github.io/
