@@ -65,7 +65,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-![screenshot](./src/static/screenshot.png)
+[![Product Name Screen Shot][product-screenshot]](https://stxgao.github.io/)
 
 The project is inspired by [Visual Studio Code](https://github.com/microsoft/vscode) and [caglarturali.github.io](https://github.com/caglarturali/caglarturali.github.io). The pages of the portfolio are powered by `markdown`, which make them easy to modify or add your own contents.
 
@@ -211,8 +211,8 @@ Project Link: [https://github.com/stxgao/stxgao.github.io](https://github.com/st
 [license-shield]: https://img.shields.io/github/license/stxgao/stxgao.github.io
 [license-url]: https://github.com/stxgao/stxgao.github.io/blob/master/LICENSE.md
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat&logo=linkedin&colorB=555
-[linkedin-url]: https://www.linkedin.com/in/yan-ying-liao/
-[product-screenshot]: ./src/static/screenshot.gif
+[linkedin-url]: https://www.linkedin.com/in/stxgao/
+[product-screenshot]: ./src/static/screenshot.png
 [gh-pages-shield]: https://img.shields.io/github/deployments/stxgao/stxgao.github.io/github-pages
 [gh-pages-url]: https://github.com/stxgao/stxgao.github.io/deployments
 [website-shield]:https://img.shields.io/website?url=https%3A%2F%2Fstxgao.github.io%2F
