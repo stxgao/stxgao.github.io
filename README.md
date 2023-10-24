@@ -14,23 +14,23 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/stxgao/react-vscode-portfolio">
+  <a href="https://github.com/stxgao/stxgao.github.io">
     <img src="./src/static/logo.svg" alt="Logo" width="80" >
   </a>
 
-<h3 align="center">react-vscode-portfolio</h3>
+<h3 align="center">stxgao.github.io</h3>
 
   <p align="center">
     A vscode inspired portfolio project
     <br />
-    <a href="https://github.com/stxgao/react-vscode-portfolio/blob/main/README.md"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/stxgao/stxgao.github.io/blob/main/README.md"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://stxgao.github.io/">View Demo</a>
     ·
     <a href="https://stxgao.github.io/#/docs">Markdown preview</a>
     ·
-    <a href="https://github.com/stxgao/react-vscode-portfolio/issues">Report Bug</a>
+    <a href="https://github.com/stxgao/stxgao.github.io/issues">Report Bug</a>
   </p>
 </div>
 
@@ -87,7 +87,7 @@ The project is inspired by [Visual Studio Code](https://github.com/microsoft/vsc
 
 1. Clone or fork the repo
    ```sh
-   git clone https://github.com/stxgao/react-vscode-portfolio.git
+   git clone https://github.com/stxgao/stxgao.github.io.git
    ```
 2. Install npm packages
    ```sh
@@ -149,7 +149,6 @@ docker-compose up
 - The project is deployed to the following domains, and they are in synchronization.
   - stevengao.dev
   - user site: [https://stxgao.github.io/](https://stxgao.github.io/)
-  - project site: [https://stxgao.github.io/react-vscode-portfolio/](https://stxgao.github.io/react-vscode-portfolio/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -185,7 +184,7 @@ Distributed under the MIT License. See `LICENSE.md` for more information.
 
 Steven Gao - [Personal Portfolio](https://stxgao.github.io/) - steven@stevengao.dev
 
-Project Link: [https://github.com/stxgao/react-vscode-portfolio](https://github.com/stxgao/react-vscode-portfolio)
+Project Link: [https://github.com/stxgao/stxgao.github.io](https://github.com/stxgao/stxgao.github.io)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -203,14 +202,14 @@ Project Link: [https://github.com/stxgao/react-vscode-portfolio](https://github.
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[forks-shield]: https://img.shields.io/github/forks/stxgao/react-vscode-portfolio
-[forks-url]: https://github.com/stxgao/react-vscode-portfolio/network/members
-[stars-shield]: https://img.shields.io/github/stars/stxgao/react-vscode-portfolio
-[stars-url]: https://github.com/stxgao/react-vscode-portfolio/stargazers
-[issues-shield]: https://img.shields.io/github/issues/stxgao/react-vscode-portfolio
-[issues-url]: https://github.com/stxgao/react-vscode-portfolio/issues
-[license-shield]: https://img.shields.io/github/license/stxgao/react-vscode-portfolio
-[license-url]: https://github.com/stxgao/react-vscode-portfolio/blob/master/LICENSE.md
+[forks-shield]: https://img.shields.io/github/forks/stxgao/stxgao.github.io
+[forks-url]: https://github.com/stxgao/stxgao.github.io/network/members
+[stars-shield]: https://img.shields.io/github/stars/stxgao/stxgao.github.io
+[stars-url]: https://github.com/stxgao/stxgao.github.io/stargazers
+[issues-shield]: https://img.shields.io/github/issues/stxgao/stxgao.github.io
+[issues-url]: https://github.com/stxgao/stxgao.github.io/issues
+[license-shield]: https://img.shields.io/github/license/stxgao/stxgao.github.io
+[license-url]: https://github.com/stxgao/stxgao.github.io/blob/master/LICENSE.md
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/yan-ying-liao/
 [product-screenshot]: ./src/static/screenshot.gif
