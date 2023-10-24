@@ -1,9 +1,10 @@
 import {
   FaGithub,
   FaLinkedin,
+  FaInstagram,
   FaEnvelope,
   FaSpotify,
-  FaFilePdf,
+  FaFileAlt,
 } from "react-icons/fa";
 
 export const links = [
@@ -15,26 +16,32 @@ export const links = [
   },
   {
     index: 1,
-    title: "Find me on LinkedIn",
+    title: "Connect with me on LinkedIn",
     href: "https://www.linkedin.com/in/stxgao/",
     icon: <FaLinkedin />,
   },
   {
     index: 2,
-    title: "Contact me via Email",
-    href: "mailto:steven@stevengao.dev",
-    icon: <FaEnvelope />,
+    title: "Follow me on Instagram",
+    href: "https://www.instagram.com/stxgao/",
+    icon: <FaInstagram />,
   },
   {
     index: 3,
-    title: "View my Spotify",
+    title: "Checkout my Spotify",
     href: "https://open.spotify.com/artist/3Tb6ZgyQYziuEJfpooFoXk",
     icon: <FaSpotify />,
   },
   {
     index: 4,
+    title: "Shoot me an Email",
+    href: "mailto:steven@stevengao.dev",
+    icon: <FaEnvelope />,
+  },
+  {
+    index: 5,
     title: "View my Resume",
-    href: "../../static/resume.pdf",
-    icon: <FaFilePdf />,
+    href: "../../resume.pdf",
+    icon: <FaFileAlt />,
   },
 ];
