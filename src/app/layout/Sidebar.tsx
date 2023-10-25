@@ -43,35 +43,45 @@ export default function Sidebar({
         justifyContent="center"
         flexDirection="column"
       >
-        <Box
-          sx={{
-            borderLeft: expanded
-              ? "solid 0.12em white"
-              : darkMode
-              ? "solid 0.12em #333333"
-              : "solid 0.12em #2c2c2c",
-            cursor: "pointer",
-            WebkitTapHighlightColor: "rgba(0,0,0,0)",
-          }}
-          onClick={() => setExpanded(!expanded)}
-        >
+        <Tooltip title="Toggle Explorer" arrow placement="right">
           <Box
-            sx={{
-              flexGrow: 0,
-              my: 1.5,
-              color: expanded ? "white" : "#858585",
-              fontSize: 24,
-              outline: "none",
-              "&:hover": {
-                color: "white",
-              },
+            tabIndex={0}
+            role="button"
+            onClick={() => setExpanded(!expanded)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setExpanded(!expanded);
+              }
             }}
-            display="flex"
-            justifyContent="center"
+            sx={{
+              borderLeft: expanded
+                ? "solid 0.12em white"
+                : darkMode
+                ? "solid 0.12em #333333"
+                : "solid 0.12em #2c2c2c",
+              cursor: "pointer",
+              WebkitTapHighlightColor: "rgba(0,0,0,0)",
+            }}
+            aria-expanded={expanded}
           >
-            <VscFiles />
+            <Box
+              sx={{
+                flexGrow: 0,
+                my: 1.5,
+                color: expanded ? "white" : "#858585",
+                fontSize: 24,
+                outline: "none",
+                "&:hover": {
+                  color: "white",
+                },
+              }}
+              display="flex"
+              justifyContent="center"
+            >
+              <VscFiles />
+            </Box>
           </Box>
-        </Box>
+        </Tooltip>
         <Tooltip title="Source of this project" arrow placement="right">
           <Link
             target="_blank"
@@ -144,6 +154,14 @@ export default function Sidebar({
           arrow
         >
           <Box
+            tabIndex={0}
+            role="button"
+            onClick={handleThemeChange}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleThemeChange();
+              }
+            }}
             sx={{
               flexGrow: 0,
               fontSize: 24,
@@ -156,9 +174,8 @@ export default function Sidebar({
             }}
             display="flex"
             justifyContent="center"
-            onClick={handleThemeChange}
           >
-            {!darkMode ? (
+              {!darkMode ? (
               <Box>
                 <DarkModeOutlinedIcon />
               </Box>
@@ -171,9 +188,17 @@ export default function Sidebar({
         </Tooltip>
         <Tooltip title="Markdown syntax" arrow placement="right">
           <Link
+            tabIndex={0}
+            role="button"
             onClick={() => {
-              setSelectedIndex(-1);
+              setSelectedIndex(6);
               navigate("/docs");
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setSelectedIndex(6);
+                navigate("/docs");              
+              }
             }}
             underline="none"
             color="inherit"

@@ -68,6 +68,22 @@ export default function AppTree({
     }
   }
 
+  function clickHandler(event: React.SyntheticEvent, nodeId: string) {
+    const index = parseInt(nodeId);
+    if (index === -1) {
+      navigate("/");
+      setSelectedIndex(-1);
+    } else {
+      if (!visiblePageIndexs.includes(index)) {
+        const newIndexs = [...visiblePageIndexs, index];
+        setVisiblePageIndexs(newIndexs);
+      }
+      navigate(pages[index].route);
+      setSelectedIndex(index);
+      setCurrentComponent("tree");
+    }
+  }
+
   return (
     <TreeView
       aria-label="file system navigator"
@@ -75,17 +91,16 @@ export default function AppTree({
       defaultExpandIcon={<ChevronRightIcon />}
       sx={{ minWidth: 220 }}
       defaultExpanded={["-1"]}
-
+      onNodeSelect={clickHandler}
       // sx={{ height: 240, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
     >
       <TreeItem
+        key={-1}
         nodeId="-1"
         label="Home"
         color="#bdc3cf"
-        onClick={() => {
-          navigate("/");
-          setSelectedIndex(-1);
-        }}
+        aria-label="View Home Page"
+        aria-selected={selectedIndex === -1}
       >
         {pages.map(({ index, name, route }) => (
           <TreeItem
@@ -100,15 +115,7 @@ export default function AppTree({
               },
             }}
             icon={<VscMarkdown color="#6997d5" />}
-            onClick={() => {
-              if (!visiblePageIndexs.includes(index)) {
-                const newIndexs = [...visiblePageIndexs, index];
-                setVisiblePageIndexs(newIndexs);
-              }
-              navigate(route);
-              setSelectedIndex(index);
-              setCurrentComponent("tree");
-            }}
+            aria-selected={selectedIndex === index}
           />
         ))}
       </TreeItem>

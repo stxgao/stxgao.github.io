@@ -79,7 +79,7 @@ export default function AppButtons({
     }
   }
 
-  function renderPageButton(index: number, name: string, route: string) {
+  function renderPageButton(index: number, selectedIndex: number, name: string, route: string) {
     return (
       <Box
         key={index}
@@ -88,12 +88,11 @@ export default function AppButtons({
           borderRight: 1,
           borderColor: theme.palette.mode === "dark" ? "#252525" : "#f3f3f3",
         }}
+        role="tab"
+        aria-selected={selectedIndex === index} 
       >
         <Button
           key={index}
-          disableRipple
-          disableElevation
-          disableFocusRipple
           onClick={() => {
             setSelectedIndex(index);
             setCurrentComponent("button");
@@ -179,9 +178,10 @@ export default function AppButtons({
         //       theme.palette.mode === 'dark' ? '#ffffff' : '#8c8c8c',
         //   },
       }}
+      role="tablist"
     >
       {pages.map(({ index, name, route }) =>
-        renderPageButton(index, name, route)
+        renderPageButton(index, selectedIndex, name, route)
       )}
     </Container>
   );
