@@ -52,7 +52,7 @@ export default function Home({ setSelectedIndex }: Props) {
               justifyContent={{ xs: "center", sm: "center" }}
             >
               <Typography variant="subtitle1" gutterBottom>
-                Software Engineer, UX/UI
+                Software Engineer, UI/UX
                 📍 San Francisco
                 {/* Better an{' '}
                 <Box fontWeight="fontWeightMedium" display="inline">
