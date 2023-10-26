@@ -1,10 +1,10 @@
 # 💻 Skills
 
-## Programming Languages
+### Programming Languages
 HTML | CSS | JavaScript | TypeScript | Java | Python | SQL
 
-## Web
-Node.js | Ember | React
+### Web
+Node.js | React | Ember
 
-## Etc.
-Git | Github Actions | Cloudflare | AWS | Docker
+### Etc.
+Git | GitHub Actions | Cloudflare | AWS | Docker

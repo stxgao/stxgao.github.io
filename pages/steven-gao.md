@@ -9,18 +9,15 @@ Software Engineer specializing in web application development. Well-versed in pr
 ### Programming Languages
 HTML | CSS | JavaScript | TypeScript | Java | Python | SQL
 
-### Web
-Node.js | Ember | React
-
-### Etc.
-Git | Github Actions | Cloudflare | AWS | Docker
+### Technologies
+Node.js | React | Ember | Git | GitHub Actions | Cloudflare | AWS | Docker
 
 ## Experience
 
 **Senior Software Engineer** @ [LinkedIn](https://www.linkedin.com/) _(March 2019 - Present)_
-- Driving, designing, and implementing full-stack enterprise functionality across LinkedIn’s ads offerings, enabling permission management, billing customer support, payment wallets, self-serve invoicing, and more.
-- Founding engineer launching LinkedIn’s business manager tool, streamlining marketing operations at scale by providing users with a unified hub for seamlessly managing employees and marketing assets.
-- Championed accessibility for LinkedIn’s ad offerings by leading accessibility audits, hosting office hours, and up-leveling junior engineers through demos, presentations, and mentoring.
+- Driving, designing, and implementing full-stack enterprise functionality across LinkedIn’s ads offerings, enabling permission management, billing customer support, payment wallets, self-serve invoicing, and more. 
+- Founding engineer launching LinkedIn’s business manager tool, providing advertisers and agencies with a unified hub for seamlessly managing employees and marketing assets, streamlining marketing operations at scale.
+- Championed web accessibility across LinkedIn’s ad offerings by leading accessibility audits, hosting office hours, and up-leveling junior engineers through demos, presentations, and mentoring. 
 
 **Software Engineering Intern** @ [LinkedIn](https://www.linkedin.com/) _(May - August 2018)_
 - Implemented enterprise functionality on LinkedIn’s new ads campaign manager platform built with Ember.
@@ -44,8 +41,8 @@ Git | Github Actions | Cloudflare | AWS | Docker
 
 ## Projects
 
-**Coinwatchbot** _(November 2017)_
+**Coinwatchbot**
 - Designed a Python-based Reddit bot that, when prompted by users, generates Markdown tables with real-time information for over a thousand cryptocurrencies available from the CoinMarketCap API.
 
-**Where’s it Lit?** _(February 2016)_
-- Built at NWHacks 2016, Where’s it Lit? parses JSON files from the Bandsintown API and utilizes the Google Maps API to visualize the concert coverage of your favorite artists.
+**Where’s it Lit?**
+- Built at NWHacks, Where’s it Lit? parses JSON files from the Bandsintown API and utilizes the Google Maps API to visualize the concert coverage of your favorite artists.
