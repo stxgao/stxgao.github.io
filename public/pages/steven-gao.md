@@ -6,11 +6,14 @@ Software Engineer specializing in web application development. Well-versed in pr
 
 ## Skills
 
-#### Programming Languages
-HTML | CSS | JavaScript | TypeScript | Java | Python
+### Programming Languages
+HTML | CSS | JavaScript | TypeScript | Java | Python | SQL
 
 ### Web
 Node.js | Ember | React
+
+### Etc.
+Git | Github Actions | Cloudflare | AWS | Docker
 
 ## Experience
 
