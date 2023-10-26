@@ -5,7 +5,7 @@ import { FaLinkedinIn } from "react-icons/fa";
 export const links = [
   {
     index: 0,
-    title: "Find me on Github",
+    title: "Find me on GitHub",
     href: "https://github.com/stxgao",
     icon: <VscGithub />,
   },
@@ -24,7 +24,7 @@ export const links = [
   {
     index: 3,
     title: "View my Resume",
-    href: "../../resume.pdf",
+    href: "../../steven_gao_resume.pdf",
     icon: <VscFilePdf />,
   },
 ];
