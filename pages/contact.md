@@ -1,9 +1,11 @@
 # 📬 Contact
 
-**Hey! Steven here. 👋**
+**Hello, Steven here. 👋**
 
-Let's get in touch!
+If you want to get in touch:
 
-[[in]](https://www.linkedin.com/in/stxgao/) [linkedin.com/in/stxgao/](https://www.linkedin.com/in/stxgao/)
-steven@stevengao.dev
+- **LinkedIn:** Connect with me on [LinkedIn](https://www.linkedin.com/in/stxgao/)
 
+- **Email:** Shoot me an email at [steven@stevengao.dev](mailto:steven@stevengao.dev)
+
+I'm always open to new conversations, connections, and exciting opportunities. Looking forward to hearing from you!
