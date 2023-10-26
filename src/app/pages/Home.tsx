@@ -77,7 +77,7 @@ export default function Home({ setSelectedIndex }: Props) {
                       underline="none"
                       color="inherit"
                     >
-                      <IconButton color="inherit">{link.icon}</IconButton>
+                      <IconButton size="large" color="inherit">{link.icon}</IconButton>
                     </Link>
                   </Tooltip>
                 ))}

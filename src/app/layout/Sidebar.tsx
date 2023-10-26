@@ -82,7 +82,7 @@ export default function Sidebar({
             </Box>
           </Box>
         </Tooltip>
-        <Tooltip title="Source of this project" arrow placement="right">
+        <Tooltip title="Source Control" arrow placement="right">
           <Link
             target="_blank"
             href={"https://github.com/stxgao/stxgao.github.io"}
