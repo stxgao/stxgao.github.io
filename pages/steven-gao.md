@@ -2,7 +2,7 @@
 
 ## Summary
 
-Software Engineer specializing in web application development. Well-versed in programming languages including Java, Python, and JavaScript/TypeScript, as well as frameworks like Ember and React. Dual background in business and software development. Passionate about creating accessible and friendly user experiences.
+Software Engineer specializing in web application development. Well-versed in programming languages including Java, Python, and JavaScript/TypeScript, as well as frameworks like Ember and React. Dual background in business and computer science. Passionate about creating accessible and friendly user experiences.
 
 ## Skills
 
