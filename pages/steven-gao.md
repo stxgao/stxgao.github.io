@@ -17,7 +17,7 @@ Node.js | React | Ember | Git | GitHub Actions | Cloudflare | AWS | Docker
 **Senior Software Engineer** @ [LinkedIn](https://www.linkedin.com/) _(March 2019 - Present)_
 - Driving, designing, and implementing full-stack enterprise functionality across LinkedIn’s ads offerings, enabling permission management, billing customer support, payment wallets, self-serve invoicing, and more. 
 - Founding engineer launching LinkedIn’s business manager tool, providing advertisers and agencies with a centralized platform for managing employees and marketing assets; streamlining workflows and marketing operations at scale. 
-- Championed web accessibility across LinkedIn’s ad offerings by leading accessibility audits, hosting office hours, and up-leveling junior engineers through demos, presentations, and mentoring. 
+- Championed web accessibility across LinkedIn’s ads offerings by leading accessibility audits, hosting office hours, and up-leveling junior engineers through demos, presentations, and mentoring. 
 
 **Software Engineering Intern** @ [LinkedIn](https://www.linkedin.com/) _(May 2018 - August 2018)_
 - Implemented enterprise functionality on LinkedIn’s new ads campaign manager platform built with Ember.
