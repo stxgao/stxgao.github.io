@@ -1,6 +1,8 @@
 # 👨🏻‍💻 Experience
 
-**Senior Software Engineer** @ [LinkedIn](https://www.linkedin.com/) _(March 2019 - Present)_
+**Software Engineer** @ [CrowdStrike](https://www.crowdstrike.com/) _(Feb 2024 - Present)_
+
+**Senior Software Engineer** @ [LinkedIn](https://www.linkedin.com/) _(March 2019 - December 2023)_
 - Driving, designing, and implementing full-stack enterprise functionality across LinkedIn’s ads offerings, enabling permission management, billing customer support, payment wallets, self-serve invoicing, and more. 
 - Founding engineer launching LinkedIn’s business manager tool, providing advertisers and agencies with a centralized platform for managing employees and marketing assets; streamlining workflows and marketing operations at scale. 
 - Championed web accessibility across LinkedIn’s ads offerings by leading accessibility audits, hosting office hours, and up-leveling junior engineers through demos, presentations, and mentoring. 
