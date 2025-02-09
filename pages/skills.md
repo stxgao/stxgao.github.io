@@ -3,8 +3,8 @@
 ### Programming Languages
 HTML | CSS | JavaScript | TypeScript | Java | Python | SQL
 
-### Web
-Node.js | React | Ember
+### Web Development
+React | Ember | Node.js | REST APIs | GraphQL | Selenium | Playwright
 
-### Etc.
-Git | GitHub Actions | Cloudflare | AWS | Docker
+### Tools & Infrastructure  
+Git | GitHub Actions | Jenkins | AWS | Cloudflare | Docker
