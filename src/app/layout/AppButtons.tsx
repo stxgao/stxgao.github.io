@@ -30,7 +30,6 @@ export default function AppButtons({
 }: Props) {
   const navigate = useNavigate();
   const theme = useTheme();
-  // const [selectedIndex, setSelectedIndex] = useState(-1);
   function renderButtonBgColor(index: number) {
     if (theme.palette.mode === "dark") {
       return selectedIndex === index ? "#1e1e1e" : "#2d2d2d";
@@ -159,7 +158,6 @@ export default function AppButtons({
         backgroundColor: theme.palette.mode === "dark" ? "#252527" : "#f3f3f3",
         "&::-webkit-scrollbar": {
           height: "3px",
-          // backgroundColor: 'red',
         },
         "&::-webkit-scrollbar-thumb": {
           backgroundColor:
@@ -169,14 +167,6 @@ export default function AppButtons({
           backgroundColor:
             theme.palette.mode === "dark" ? "#ffffff" : "#8c8c8c",
         },
-        // '&::-webkit-scrollbar:hover, & *::-webkit-scrollbar:hover': {
-        //   backgroundColor: '#ffffff',
-        // },
-        // '&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
-        //   {
-        //     backgroundColor:
-        //       theme.palette.mode === 'dark' ? '#ffffff' : '#8c8c8c',
-        //   },
       }}
       role="tablist"
     >

@@ -54,14 +54,6 @@ export default function Home({ setSelectedIndex }: Props) {
               <Typography variant="subtitle1" gutterBottom>
                 Software Engineer, UI/UX
                 📍 San Francisco
-                {/* Better an{' '}
-                <Box fontWeight="fontWeightMedium" display="inline">
-                  oops
-                </Box>{' '}
-                than a{' '}
-                <Box fontWeight="fontWeightMedium" display="inline">
-                  what if
-                </Box> */}
               </Typography>
             </Grid>
             <Grid

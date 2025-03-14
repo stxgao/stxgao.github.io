@@ -39,7 +39,6 @@ export default function AppTree({
 }: Props) {
   const navigate = useNavigate();
   const theme = useTheme();
-  // const [selectedIndex, setSelectedIndex] = useState(-1);
   let { pathname } = useLocation();
 
   const page: Page = pages.find((x) => x.route === pathname)!;
@@ -92,7 +91,6 @@ export default function AppTree({
       sx={{ minWidth: 220 }}
       defaultExpanded={["-1"]}
       onNodeSelect={clickHandler}
-      // sx={{ height: 240, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
     >
       <TreeItem
         key={-1}
