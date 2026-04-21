@@ -8,48 +8,56 @@ import {
   ThemeProvider,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import AppTree from "./AppTree";
 import Footer from "./Footer";
 import Sidebar from "./Sidebar";
-import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Navigate, useLocation } from "react-router-dom";
 import AppButtons from "./AppButtons";
 import MDContainer from "../components/MDContainer";
 import Home from "../pages/Home";
 import { pages } from "../pages/pages";
 import usePageTracking from "../hooks/usePageTracking";
-import { isBrowser } from "react-device-detect";
+import { useAppStore } from "../store/useAppStore";
 
-interface Page {
-  index: number;
-  name: string;
-  route: string;
-  visible: boolean;
-}
-
-function initVisiblePageIndexs(pages: Page[]) {
-  const tabs = [];
-  for (let i = 0; i < pages.length; i++) {
-    const page = pages[i];
-    if (page.visible) tabs.push(page.index);
-  }
-  return tabs;
-}
-
+/**
+ * Main application routing shell and top-level layout wrapper.
+ * Manages the global theme palette and controls conditional rendering
+ * for the structural UI grid (Sidebar, Explorer Tree, Editor Tabs, and Markdown viewport).
+ * 
+ * @returns {React.ReactElement} The rendered application layout.
+ */
 export default function App() {
   const navigate = useNavigate();
-  const [expanded, setExpanded] = useState(isBrowser);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [currentComponent, setCurrentComponent] = useState("");
-  const [visiblePageIndexs, setVisiblePageIndexs] = useState(
-    initVisiblePageIndexs(pages)
-  );
-  const [darkMode, setDarkMode] = useState(false);
-  const [visiblePages, setVisiblePages] = useState(
-    pages.filter((x) => x.visible)
-  );
-  const paletteType = darkMode ? "dark" : "light";
+  const location = useLocation();
   usePageTracking();
+
+  const {
+    expanded,
+    selectedIndex,
+    setSelectedIndex,
+    visiblePageIndexes,
+    darkMode,
+  } = useAppStore();
+
+  const visiblePages = useMemo(
+    () => visiblePageIndexes
+      .map((index) => pages.find((x) => x.index === index))
+      .filter((page): page is (typeof pages)[0] => page !== undefined),
+    [visiblePageIndexes]
+  );
+
+  useEffect(() => {
+    const currentPage = pages.find((p) => p.route === location.pathname);
+    if (currentPage && currentPage.index !== selectedIndex) {
+      setSelectedIndex(currentPage.index);
+    } else if (location.pathname === "/" && selectedIndex !== -1) {
+      setSelectedIndex(-1);
+    }
+  }, [location.pathname, selectedIndex, setSelectedIndex]);
+
+  const paletteType = darkMode ? "dark" : "light";
+
   const theme = createTheme({
     palette: {
       mode: paletteType,
@@ -73,49 +81,6 @@ export default function App() {
     },
   });
 
-  function handleThemeChange() {
-    setDarkMode(!darkMode);
-    localStorage.setItem("theme", darkMode ? "light" : "dark");
-  }
-
-  useEffect(() => {
-    const currentTheme = localStorage.getItem("theme");
-    if (!currentTheme) setDarkMode(true);
-    else setDarkMode(currentTheme === "dark");
-  }, []);
-
-  const deletedIndex = visiblePages.find(
-    (x) => !visiblePageIndexs.includes(x.index)
-  )?.index;
-
-  useEffect(() => {
-    const newPages = visiblePageIndexs
-      .map((index) => pages.find((x) => x.index === index))
-      .filter((page): page is Page => page !== undefined);
-
-    setVisiblePages(newPages);
-
-    if (visiblePageIndexs.length === 0) {
-      // No visible pages, reset selection and navigate to the home page
-      setSelectedIndex(-1);
-      navigate("/");
-      return;
-    }
-
-    if (deletedIndex === selectedIndex) {
-      // Handle tab deletion and update the selected index
-      const newSelectedIndex =
-        deletedIndex > Math.max(...visiblePageIndexs)
-          ? Math.max(...visiblePageIndexs)
-          : Math.min(...visiblePageIndexs);
-
-      setSelectedIndex(newSelectedIndex);
-
-      const newPage = pages.find((x) => x.index === newSelectedIndex);
-      if (newPage) navigate(newPage.route);
-    }
-  }, [visiblePageIndexs, navigate, deletedIndex, selectedIndex]);
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
@@ -127,13 +92,7 @@ export default function App() {
         <Grid container sx={{ overflow: "auto", overflowY: "hidden" }}>
           <Grid container sx={{ overflow: "auto" }}>
             <Grid item sx={{ width: 50 }}>
-              <Sidebar
-                setExpanded={setExpanded}
-                expanded={expanded}
-                darkMode={darkMode}
-                handleThemeChange={handleThemeChange}
-                setSelectedIndex={setSelectedIndex}
-              />
+              <Sidebar />
             </Grid>
             {expanded && (
               <Grid
@@ -151,15 +110,7 @@ export default function App() {
                   >
                     EXPLORER
                   </Typography>
-                  <AppTree
-                    pages={pages.filter((x) => x.visible)}
-                    selectedIndex={selectedIndex}
-                    setSelectedIndex={setSelectedIndex}
-                    currentComponent={currentComponent}
-                    setCurrentComponent={setCurrentComponent}
-                    visiblePageIndexs={visiblePageIndexs}
-                    setVisiblePageIndexs={setVisiblePageIndexs}
-                  />
+                  <AppTree />
                 </Stack>
               </Grid>
             )}
@@ -170,15 +121,7 @@ export default function App() {
                   height: "33px",
                 }}
               >
-                <AppButtons
-                  pages={visiblePages}
-                  selectedIndex={selectedIndex}
-                  setSelectedIndex={setSelectedIndex}
-                  currentComponent={currentComponent}
-                  setCurrentComponent={setCurrentComponent}
-                  visiblePageIndexs={visiblePageIndexs}
-                  setVisiblePageIndexs={setVisiblePageIndexs}
-                />
+                <AppButtons pages={visiblePages} />
               </Grid>
 
               <Grid
@@ -191,18 +134,18 @@ export default function App() {
                 <Routes>
                   <Route
                     path="/"
-                    element={<Home setSelectedIndex={setSelectedIndex} />}
+                    element={<Home />}
                   />
                   {pages.map(({ index, name, route }) => (
                     <Route
                       key={index}
                       path={route}
-                      element={<MDContainer path={`./pages/${name}`} />}
+                      element={<MDContainer path={`/pages/${name}`} />}
                     />
                   ))}
                   <Route
                     path="/docs"
-                    element={<MDContainer path={`./pages/docs.md`} />}
+                    element={<MDContainer path={`/pages/docs.md`} />}
                   />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>

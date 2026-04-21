@@ -28,7 +28,7 @@
     <br />
     <a href="https://stxgao.github.io/">View Demo</a>
     ·
-    <a href="https://stxgao.github.io/#/docs">Markdown preview</a>
+    <a href="https://stxgao.github.io/docs">Markdown preview</a>
     ·
     <a href="https://github.com/stxgao/stxgao.github.io/issues">Report Bug</a>
   </p>
@@ -67,13 +67,22 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://stxgao.github.io/)
 
-The project is inspired by [Visual Studio Code](https://github.com/microsoft/vscode) and [caglarturali.github.io](https://github.com/caglarturali/caglarturali.github.io). The pages of the portfolio are powered by `markdown`, which make them easy to modify or add your own contents.
+The project is inspired by [Visual Studio Code](https://github.com/microsoft/vscode) and forked from [noworneverev.github.io](https://github.com/noworneverev/react-vscode-portfolio). 
+
+This fork includes several modernizations to the original project:
+- **Build System**: Migrated from Webpack (Create React App) to **Vite** for incredibly fast Hot Module Replacement (HMR) and optimized build times.
+- **State Management**: Optimized application architecture by refactoring to use **Zustand**, eliminating complex prop-drilling and improving code maintainability across components.
+- **Routing & SPA Support**: Upgraded from `HashRouter` to `BrowserRouter` to support proper modern Single Page Application (SPA) architecture with clean URLs for Search Engine Optimization (SEO) and shareable links.
+
+The pages of the portfolio are powered by `markdown`, which make them easy to modify or add your own content.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Built With
 
 * [React.js](https://reactjs.org/)
+* [Vite](https://vitejs.dev/)
+* [Zustand](https://github.com/pmndrs/zustand)
 * [Material UI](https://github.com/mui/material-ui)
 * [react-markdown](https://github.com/remarkjs/react-markdown)
 
@@ -95,19 +104,19 @@ The project is inspired by [Visual Studio Code](https://github.com/microsoft/vsc
    ```
 3. Enter your name in `.env.development`
    ```js
-   REACT_APP_NAME=<your_name>
+   VITE_APP_NAME=<your_name>
    ```
 4. Add your markdown pages in `public/pages`
-5. Add your routes in `src/app/pages/page.ts`, make sure the names of the pages are consistent with the markdown files.
+5. Add your routes in `src/app/pages/pages.ts`, make sure the names of the pages are consistent with the markdown files.
     ```ts
     export const pages = [
-      { index: 0, name: 'steven-gao.md', route: '/overview', visible: true },
-      { index: 1, name: 'skills.md', route: '/skills', visible: true },
-      { index: 2, name: 'experience.md', route: '/experience', visible: true },
-      { index: 3, name: 'education.md', route: '/education', visible: true },
-      { index: 4, name: 'projects.md', route: '/projects', visible: true },
-      { index: 5, name: 'contact.md', route: '/contact', visible: true },
-      { index: 6, name: 'docs.md', route: '/docs', visible: false },  
+      { index: 0, name: 'docs.md', route: '/docs', visible: false },
+      { index: 1, name: 'steven-gao.md', route: '/overview', visible: true },
+      { index: 2, name: 'skills.md', route: '/skills', visible: true },
+      { index: 3, name: 'experience.md', route: '/experience', visible: true },
+      { index: 4, name: 'education.md', route: '/education', visible: true },
+      { index: 5, name: 'projects.md', route: '/projects', visible: true },
+      { index: 6, name: 'contact.md', route: '/contact', visible: true },
     ];
     ```
 6. Add your social links in `src/app/pages/links.tsx`, which will appear in both the sidebar and homepage.
@@ -123,7 +132,7 @@ The project is inspired by [Visual Studio Code](https://github.com/microsoft/vsc
     ```
 7. Serve the app locally
    ```sh
-   npm start
+   npm run dev
    ```   
 8. Deploy your own portfolio,  
    - modify homepage property in `package.json` 
@@ -133,8 +142,8 @@ The project is inspired by [Visual Studio Code](https://github.com/microsoft/vsc
 
    - modify Google Analytics measurement id in `.env.production`
    ```
-   REACT_APP_NAME=<your_name>
-   REACT_APP_MEASUREMENT_ID=<your_measurement_id>   
+   VITE_APP_NAME=<your_name>
+   VITE_APP_MEASUREMENT_ID=<your_measurement_id>   
    ```
 
 ### Alternative Deployment
@@ -146,27 +155,24 @@ docker-compose up
 
 ## Demonstration
 
-- The project is deployed to the following domains, and they are in synchronization.
-  - stevengao.dev
-  - user site: [https://stxgao.github.io/](https://stxgao.github.io/)
+- The project is deployed to the following domains.
+  - [stevengao.dev](https://stevengao.dev)
+  - [https://stxgao.github.io/](https://stxgao.github.io/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- USAGE EXAMPLES -->
-## Features
+## Key Features
 
-- Powered by markdown
-- Extended markdown syntax supported
-  - Syntax highlight
-  - Alert
-- Dark mode and light mode available
-- Closeable tabs
-- Collapsible explorer
-- Responsive web design
-- Google Analytics supported
-- Auto-deploy to gh-pages and github actions ready
+- Effortlessly create and manage portfolio pages using standard Markdown files.
+  - Integrates built-in plugins for rich components, including vibrant syntax highlighting and custom UI alerts.
+- Features a collapsible file explorer, dynamic closeable editor tabs, and a responsive layout simulating a real IDE.
+  - Material UI light/dark mode toggle featuring automatic system-preference detection.
+- Single Page Application (SPA) routing capabilities via React Router (`BrowserRouter`).
+- Comes pre-configured with Google Analytics tracking and automated GitHub Actions deployment pipelines.
+- Re-architected with **Vite** for near-instant development server startups and optimized production bundling.
 
-Markdown preview: https://stxgao.github.io/#/docs
+Markdown preview: https://stxgao.github.io/docs
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -182,7 +188,7 @@ Distributed under the MIT License. See `LICENSE.md` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Steven Gao - [Personal Portfolio](https://stxgao.github.io/) - steven@stevengao.dev
+Steven Gao - [stevengao.dev](https://stevengao.dev) - steven@stevengao.dev
 
 Project Link: [https://github.com/stxgao/stxgao.github.io](https://github.com/stxgao/stxgao.github.io)
 
@@ -196,7 +202,7 @@ Project Link: [https://github.com/stxgao/stxgao.github.io](https://github.com/st
 * [Img Shields](https://shields.io)
 * [GitHub Pages](https://pages.github.com)
 * [React Icons](https://react-icons.github.io/react-icons/search)
-* [caglarturali.github.io](https://github.com/caglarturali/caglarturali.github.io)
+* [noworneverev.github.io](https://github.com/noworneverev/react-vscode-portfolio)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

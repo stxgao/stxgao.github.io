@@ -11,19 +11,18 @@ import React, { useEffect } from "react";
 import logo from "../../static/favicon.png";
 import { useLocation } from "react-router-dom";
 import { links } from "./links";
+import { useAppStore } from "../store/useAppStore";
 
-interface Props {
-  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-}
-
-export default function Home({ setSelectedIndex }: Props) {
+export default function Home() {
   const { pathname } = useLocation();
+  const { setSelectedIndex } = useAppStore();
+  
   useEffect(() => {
     setSelectedIndex(-1);
   }, [setSelectedIndex]);
 
   useEffect(() => {
-    document.title = process.env.REACT_APP_NAME!;
+    document.title = import.meta.env.VITE_APP_NAME;
   }, [pathname]);
 
   return (
@@ -45,7 +44,7 @@ export default function Home({ setSelectedIndex }: Props) {
               display="flex"
               justifyContent={{ xs: "center", sm: "center" }}
             >
-              <Typography variant="h3">{process.env.REACT_APP_NAME}</Typography>
+              <Typography variant="h3">{import.meta.env.VITE_APP_NAME}</Typography>
             </Grid>
             <Grid
               display="flex"

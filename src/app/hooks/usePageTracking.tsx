@@ -9,9 +9,9 @@ const usePageTracking = () => {
   useEffect(() => {
     if (
       !window.location.href.includes('localhost') &&
-      process.env.REACT_APP_MEASUREMENT_ID
+      import.meta.env.VITE_APP_MEASUREMENT_ID
     ) {
-      ReactGA.initialize(process.env.REACT_APP_MEASUREMENT_ID);
+      ReactGA.initialize(import.meta.env.VITE_APP_MEASUREMENT_ID);
       setInitialized(true);
     }
   }, []);

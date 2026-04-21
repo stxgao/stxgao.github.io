@@ -1,53 +1,20 @@
 import * as React from "react";
-import TreeView from "@mui/lab/TreeView";
+import { TreeView } from '@mui/x-tree-view/TreeView';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import TreeItem from "@mui/lab/TreeItem";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { useTheme } from "@mui/material/styles";
 import { VscMarkdown } from "react-icons/vsc";
+import { useAppStore } from "../store/useAppStore";
+import { pages } from "../pages/pages";
 
-interface Page {
-  index: number;
-  name: string;
-  route: string;
-}
-
-interface Props {
-  pages: {
-    index: number;
-    name: string;
-    route: string;
-  }[];
-  selectedIndex: number;
-  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-  currentComponent: string;
-  setCurrentComponent: React.Dispatch<React.SetStateAction<string>>;
-  visiblePageIndexs: number[];
-  setVisiblePageIndexs: React.Dispatch<React.SetStateAction<number[]>>;
-}
-
-export default function AppTree({
-  pages,
-  selectedIndex,
-  setSelectedIndex,
-  currentComponent,
-  setCurrentComponent,
-  visiblePageIndexs,
-  setVisiblePageIndexs,
-}: Props) {
+export default function AppTree() {
+  const visiblePages = pages.filter((x) => x.visible);
   const navigate = useNavigate();
   const theme = useTheme();
-  let { pathname } = useLocation();
-
-  const page: Page = pages.find((x) => x.route === pathname)!;
-
-  useEffect(() => {
-    if (page) {
-      setSelectedIndex(page.index);
-    }
-  }, [page, setSelectedIndex]);
+  const { selectedIndex, currentComponent, selectTab, setSelectedIndex } = useAppStore();
 
   function renderTreeItemBgColor(index: number) {
     if (theme.palette.mode === "dark") {
@@ -73,13 +40,7 @@ export default function AppTree({
       navigate("/");
       setSelectedIndex(-1);
     } else {
-      if (!visiblePageIndexs.includes(index)) {
-        const newIndexs = [...visiblePageIndexs, index];
-        setVisiblePageIndexs(newIndexs);
-      }
-      navigate(pages[index].route);
-      setSelectedIndex(index);
-      setCurrentComponent("tree");
+      selectTab(index, navigate, 'tree');
     }
   }
 
@@ -88,8 +49,8 @@ export default function AppTree({
       aria-label="file system navigator"
       defaultCollapseIcon={<ExpandMoreIcon />}
       defaultExpandIcon={<ChevronRightIcon />}
-      sx={{ minWidth: 220 }}
-      defaultExpanded={["-1"]}
+      sx={{ minWidth: 220, minHeight: 200, flexGrow: 1 }}
+      expanded={["-1"]}
       onNodeSelect={clickHandler}
     >
       <TreeItem
@@ -100,7 +61,7 @@ export default function AppTree({
         aria-label="View Home Page"
         aria-selected={selectedIndex === -1}
       >
-        {pages.map(({ index, name, route }) => (
+        {visiblePages.map(({ index, name }) => (
           <TreeItem
             key={index}
             nodeId={index.toString()}

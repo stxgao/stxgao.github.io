@@ -4,32 +4,17 @@ import { VscMarkdown, VscChromeClose } from "react-icons/vsc";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import { Container } from "@mui/system";
+import { useAppStore, Page } from "../store/useAppStore";
 
 interface Props {
-  pages: {
-    index: number;
-    name: string;
-    route: string;
-  }[];
-  selectedIndex: number;
-  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-  currentComponent: string;
-  setCurrentComponent: React.Dispatch<React.SetStateAction<string>>;
-  visiblePageIndexs: number[];
-  setVisiblePageIndexs: React.Dispatch<React.SetStateAction<number[]>>;
+  pages: Page[];
 }
 
-export default function AppButtons({
-  pages,
-  selectedIndex,
-  setSelectedIndex,
-  currentComponent,
-  setCurrentComponent,
-  visiblePageIndexs,
-  setVisiblePageIndexs,
-}: Props) {
+export default function AppButtons({ pages }: Props) {
   const navigate = useNavigate();
   const theme = useTheme();
+  const { selectedIndex, selectTab, closeTab } = useAppStore();
+
   function renderButtonBgColor(index: number) {
     if (theme.palette.mode === "dark") {
       return selectedIndex === index ? "#1e1e1e" : "#2d2d2d";
@@ -56,7 +41,7 @@ export default function AppButtons({
 
   function renderCloseButtonColor(index: number) {
     if (theme.palette.mode === "dark") {
-      return selectedIndex === index ? "#white" : "#2d2d2d";
+      return selectedIndex === index ? "#ffffff" : "#2d2d2d";
     } else {
       return selectedIndex === index ? "#72736d" : "#ececec";
     }
@@ -72,7 +57,7 @@ export default function AppButtons({
 
   function renderCloseButtonHoverColor(index: number) {
     if (theme.palette.mode === "dark") {
-      return selectedIndex !== index ? "#817d7a" : "#white";
+      return selectedIndex !== index ? "#817d7a" : "#ffffff";
     } else {
       return selectedIndex === index ? "#44434b" : "#92938e";
     }
@@ -92,11 +77,7 @@ export default function AppButtons({
       >
         <Button
           key={index}
-          onClick={() => {
-            setSelectedIndex(index);
-            setCurrentComponent("button");
-            navigate(route);
-          }}
+          onClick={() => selectTab(index, navigate)}
           sx={{
             borderRadius: 0,
             px: 2,
@@ -134,9 +115,7 @@ export default function AppButtons({
             elevation={0}
             onClick={(e: any) => {
               e.stopPropagation();
-              setVisiblePageIndexs(
-                visiblePageIndexs.filter((x) => x !== index)
-              );
+              closeTab(index, navigate);
             }}
           >
             <VscChromeClose />

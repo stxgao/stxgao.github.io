@@ -7,23 +7,12 @@ import { BiGitBranch } from "react-icons/bi";
 import Divider from "@mui/material/Divider";
 import { links } from "../pages/links";
 import { useNavigate } from "react-router-dom";
+import { useAppStore } from "../store/useAppStore";
 
-interface Props {
-  expanded: boolean;
-  setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
-  darkMode: boolean;
-  handleThemeChange: () => void;
-  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-}
-
-export default function Sidebar({
-  expanded,
-  setExpanded,
-  darkMode,
-  handleThemeChange,
-  setSelectedIndex,
-}: Props) {
+export default function Sidebar() {
   const navigate = useNavigate();
+  const { expanded, setExpanded, darkMode, toggleTheme, setSelectedIndex } = useAppStore();
+
   return (
     <Box
       sx={{
@@ -57,8 +46,8 @@ export default function Sidebar({
               borderLeft: expanded
                 ? "solid 0.12em white"
                 : darkMode
-                ? "solid 0.12em #333333"
-                : "solid 0.12em #2c2c2c",
+                  ? "solid 0.12em #333333"
+                  : "solid 0.12em #2c2c2c",
               cursor: "pointer",
               WebkitTapHighlightColor: "rgba(0,0,0,0)",
             }}
@@ -156,10 +145,10 @@ export default function Sidebar({
           <Box
             tabIndex={0}
             role="button"
-            onClick={handleThemeChange}
+            onClick={toggleTheme}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                handleThemeChange();
+                toggleTheme();
               }
             }}
             sx={{
@@ -175,7 +164,7 @@ export default function Sidebar({
             display="flex"
             justifyContent="center"
           >
-              {!darkMode ? (
+            {!darkMode ? (
               <Box>
                 <DarkModeOutlinedIcon />
               </Box>
@@ -191,13 +180,13 @@ export default function Sidebar({
             tabIndex={0}
             role="button"
             onClick={() => {
-              setSelectedIndex(6);
+              setSelectedIndex(0);
               navigate("/docs");
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                setSelectedIndex(6);
-                navigate("/docs");              
+                setSelectedIndex(0);
+                navigate("/docs");
               }
             }}
             underline="none"
