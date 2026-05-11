@@ -15,8 +15,14 @@ export default function AppTree() {
   const visiblePages = pages.filter((x) => x.visible);
   const navigate = useNavigate();
   const theme = useTheme();
-  const { selectedIndex, currentComponent, selectTab, setSelectedIndex, setExpanded, isMobile } =
-    useAppStore();
+  const {
+    selectedIndex,
+    currentComponent,
+    selectTab,
+    setSelectedIndex,
+    setIsSidebarExpanded,
+    isMobile,
+  } = useAppStore();
 
   const getItemColor = (index: number) => {
     const isSelected = selectedIndex === index;
@@ -30,7 +36,12 @@ export default function AppTree() {
 
     // If already on this page, just close the sidebar on mobile
     if (index === selectedIndex) {
-      if (isMobile) setExpanded(false);
+      if (isMobile) {
+        // Wait a frame to ensure any hover states are cleared
+        requestAnimationFrame(() => {
+          setIsSidebarExpanded(false);
+        });
+      }
       return;
     }
 

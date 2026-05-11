@@ -113,10 +113,12 @@ export default function MarkdownRenderer({
       tbody: ({ children }) => <TableBody>{children}</TableBody>,
       tfoot: ({ children }) => <TableFooter>{children}</TableFooter>,
       code: (props): ReactElement => {
-        const { inline, className, children } = props;
+        const { className, children, ...rest } = props;
         const codeString = String(children).replace(/\n$/, '');
+        const match = /language-(\w+)/.exec(className || '');
+        const inline = !match;
 
-        if (inline) {
+        if (inline && !className) {
           return (
             <Chip
               component="span"
@@ -131,8 +133,8 @@ export default function MarkdownRenderer({
               }}
             />
           );
-        } else if (className) {
-          const language = className.split('-')[1];
+        } else if (match) {
+          const language = match[1];
           return (
             <SyntaxHighlighter
               language={language}

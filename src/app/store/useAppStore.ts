@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { isBrowser, isMobile } from 'react-device-detect';
 import { NavigateFunction } from 'react-router-dom';
 import { pages } from '../constants/pages';
@@ -38,10 +39,20 @@ interface AppState {
   isMobile: boolean;
 
   /**
-   * Specifies whether the left side file explorer is expanded.
+   * Specifies whether the sidebar panel is expanded.
    * @default isBrowser (true on desktop, false on mobile)
    */
-  expanded: boolean;
+  isSidebarExpanded: boolean;
+
+  /**
+   * Tracks the active panel in the sidebar.
+   */
+  activePanel: 'explorer' | 'aiAssistant';
+
+  /**
+   * The current width of the side panel in pixels.
+   */
+  panelWidth: number;
 
   /**
    * Tracks the index of the currently active/focused file tab.
@@ -73,16 +84,36 @@ interface AppState {
 
   /**
    * Specifies whether the application is in dark mode globally.
-   * @remarks Value determined by localStorage or system preference on load.
+   * @remarks Value persisted across sessions and respects system preference as a fallback.
    */
   isDarkMode: boolean;
 
   /**
-   * Sets the expansion state of the sidebar file explorer.
-   *
-   * @param expanded - The new expansion state.
+   * Cached content of the markdown pages.
    */
-  setExpanded: (expanded: boolean) => void;
+  pageContents: Record<string, string>;
+
+  /**
+   * Preloads all markdown pages into memory.
+   */
+  preloadPages: () => Promise<void>;
+
+  /**
+   * Sets the expansion state of the side panel.
+   *
+   * @param isSidebarExpanded - The new expansion state.
+   */
+  setIsSidebarExpanded: (isSidebarExpanded: boolean) => void;
+
+  /**
+   * Sets the active panel in the sidebar.
+   */
+  setActivePanel: (panel: 'explorer' | 'aiAssistant') => void;
+
+  /**
+   * Updates the side panel width.
+   */
+  setPanelWidth: (width: number) => void;
 
   /**
    * Sets the currently active/focused file tab.
@@ -106,7 +137,7 @@ interface AppState {
   setVisiblePageIndexes: (indexes: number[]) => void;
 
   /**
-   * Toggles the global theme and persists the user's preference to localStorage.
+   * Toggles the global theme and persists the user's preference.
    */
   toggleTheme: () => void;
 
@@ -131,16 +162,6 @@ interface AppState {
    * @param navigate - React Router navigate function.
    */
   closeTab: (index: number, navigate: NavigateFunction) => void;
-
-  /**
-   * The current width of the side panel in pixels.
-   */
-  panelWidth: number;
-
-  /**
-   * Updates the side panel width and persists it to localStorage.
-   */
-  setPanelWidth: (width: number) => void;
 }
 
 /**
@@ -151,90 +172,133 @@ const initialVisibleIndexes: number[] = pages
   .map((page) => page.index);
 
 /**
+ * Defines which parts of the AppState should be persisted to localStorage.
+ */
+const getPersistentState = (state: AppState) => ({
+  activePanel: state.activePanel,
+  isDarkMode: state.isDarkMode,
+  panelWidth: state.panelWidth,
+  visiblePageIndexes: state.visiblePageIndexes,
+  tabHistory: state.tabHistory,
+});
+
+/**
  * Zustand hook defining the application UI's central control state.
  * Accessible from any component directly without prop drilling.
  */
-export const useAppStore = create<AppState>()((set) => ({
-  isMobile: isMobile,
-  expanded: isBrowser,
-  selectedIndex: -1,
-  currentComponent: '',
-  visiblePageIndexes: initialVisibleIndexes,
-  tabHistory: initialVisibleIndexes,
-  isDarkMode: (() => {
-    const theme = localStorage.getItem('theme');
-    return theme ? theme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-  })(),
-  panelWidth: parseInt(localStorage.getItem('panelWidth') || '250'),
+export const useAppStore = create<AppState>()(
+  persist(
+    (set, get) => ({
+      isMobile: isMobile,
+      isSidebarExpanded: isBrowser,
+      activePanel: 'explorer',
+      selectedIndex: -1,
+      currentComponent: '',
+      visiblePageIndexes: initialVisibleIndexes,
+      tabHistory: initialVisibleIndexes,
+      isDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
+      panelWidth: 250,
+      pageContents: {},
 
-  setExpanded: (expanded) => set({ expanded }),
-  setPanelWidth: (panelWidth) => {
-    localStorage.setItem('panelWidth', panelWidth.toString());
-    set({ panelWidth });
-  },
-  setSelectedIndex: (selectedIndex) =>
-    set((state) => ({
-      selectedIndex,
-      // Only track real file tabs (> 0) in MRU history; -1 means Home/no-tab, 0 means docs
-      tabHistory:
-        selectedIndex > 0
-          ? [...state.tabHistory.filter((id) => id !== selectedIndex), selectedIndex]
-          : state.tabHistory,
-    })),
-  setCurrentComponent: (currentComponent) => set({ currentComponent }),
-  setVisiblePageIndexes: (visiblePageIndexes) =>
-    set((state) => ({
-      visiblePageIndexes,
-      tabHistory: state.tabHistory.filter((id) => visiblePageIndexes.includes(id)),
-    })),
-  toggleTheme: () =>
-    set((state) => {
-      const isDarkMode = !state.isDarkMode;
-      localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-      return { isDarkMode };
+      preloadPages: async () => {
+        const { pageContents } = get();
+        // Skip if already loaded
+        if (Object.keys(pageContents).length >= pages.length) return;
+
+        const results = await Promise.all(
+          pages.map(async (page) => {
+            try {
+              const res = await fetch(`/pages/${page.name}`);
+              if (res.ok) {
+                const text = await res.text();
+                return { name: page.name, text };
+              }
+            } catch (e) {
+              console.error(`Failed to preload ${page.name}`, e);
+            }
+            return null;
+          }),
+        );
+
+        const newContents: Record<string, string> = {};
+        results.forEach((res) => {
+          if (res) newContents[res.name] = res.text;
+        });
+
+        set({ pageContents: newContents });
+      },
+
+      setIsSidebarExpanded: (isSidebarExpanded) => set({ isSidebarExpanded }),
+      setPanelWidth: (panelWidth) => {
+        set({ panelWidth });
+      },
+      setActivePanel: (activePanel) => {
+        set({ activePanel });
+      },
+      setSelectedIndex: (selectedIndex) =>
+        set((state) => ({
+          selectedIndex,
+          // Only track real file tabs (> 0) in MRU history; -1 means Home/no-tab, 0 means docs
+          tabHistory:
+            selectedIndex > 0
+              ? [...state.tabHistory.filter((id) => id !== selectedIndex), selectedIndex]
+              : state.tabHistory,
+        })),
+      setCurrentComponent: (currentComponent) => set({ currentComponent }),
+      setVisiblePageIndexes: (visiblePageIndexes) =>
+        set((state) => ({
+          visiblePageIndexes,
+          tabHistory: state.tabHistory.filter((id) => visiblePageIndexes.includes(id)),
+        })),
+      toggleTheme: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+
+      selectTab: (index, navigate, component = 'tab') => {
+        const page = pages.find((p) => p.index === index);
+        if (!page) return;
+        navigate(page.route);
+        set((state) => ({
+          selectedIndex: index,
+          currentComponent: component,
+          visiblePageIndexes: state.visiblePageIndexes.includes(index)
+            ? state.visiblePageIndexes
+            : [...state.visiblePageIndexes, index],
+          tabHistory: [...state.tabHistory.filter((id) => id !== index), index],
+        }));
+      },
+
+      closeTab: (index, navigate) => {
+        set((state) => {
+          const newVisible = state.visiblePageIndexes.filter((x) => x !== index);
+          const newHistory = state.tabHistory.filter((x) => x !== index);
+
+          if (newVisible.length === 0) {
+            navigate('/');
+            return { visiblePageIndexes: newVisible, tabHistory: newHistory, selectedIndex: -1 };
+          }
+
+          if (state.selectedIndex === index) {
+            // VSCode MRU fallback: pick the most recently used remaining tab
+            const fallbackIndex =
+              newHistory.length > 0
+                ? newHistory[newHistory.length - 1]
+                : newVisible[newVisible.length - 1];
+            const fallbackPage = pages.find((p) => p.index === fallbackIndex);
+            if (fallbackPage) navigate(fallbackPage.route);
+            return {
+              visiblePageIndexes: newVisible,
+              tabHistory: newHistory,
+              selectedIndex: fallbackIndex,
+            };
+          }
+
+          // Closing a background tab — no navigation needed
+          return { visiblePageIndexes: newVisible, tabHistory: newHistory };
+        });
+      },
     }),
-
-  selectTab: (index, navigate, component = 'tab') => {
-    const page = pages.find((p) => p.index === index);
-    if (!page) return;
-    navigate(page.route);
-    set((state) => ({
-      selectedIndex: index,
-      currentComponent: component,
-      visiblePageIndexes: state.visiblePageIndexes.includes(index)
-        ? state.visiblePageIndexes
-        : [...state.visiblePageIndexes, index],
-      tabHistory: [...state.tabHistory.filter((id) => id !== index), index],
-    }));
-  },
-
-  closeTab: (index, navigate) => {
-    set((state) => {
-      const newVisible = state.visiblePageIndexes.filter((x) => x !== index);
-      const newHistory = state.tabHistory.filter((x) => x !== index);
-
-      if (newVisible.length === 0) {
-        navigate('/');
-        return { visiblePageIndexes: newVisible, tabHistory: newHistory, selectedIndex: -1 };
-      }
-
-      if (state.selectedIndex === index) {
-        // VSCode MRU fallback: pick the most recently used remaining tab
-        const fallbackIndex =
-          newHistory.length > 0
-            ? newHistory[newHistory.length - 1]
-            : newVisible[newVisible.length - 1];
-        const fallbackPage = pages.find((p) => p.index === fallbackIndex);
-        if (fallbackPage) navigate(fallbackPage.route);
-        return {
-          visiblePageIndexes: newVisible,
-          tabHistory: newHistory,
-          selectedIndex: fallbackIndex,
-        };
-      }
-
-      // Closing a background tab — no navigation needed
-      return { visiblePageIndexes: newVisible, tabHistory: newHistory };
-    });
-  },
-}));
+    {
+      name: 'stxgao-workbench-state',
+      partialize: getPersistentState,
+    },
+  ),
+);

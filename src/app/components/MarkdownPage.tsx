@@ -15,9 +15,18 @@ export default function MarkdownPage({ path }: Props) {
   const [content, setContent] = useState('');
   const [error, setError] = useState<string | null>(null);
   const { pathname } = useLocation();
-  const { isMobile, setIsSidebarExpanded } = useAppStore();
+  const { isMobile, setIsSidebarExpanded, pageContents } = useAppStore();
 
   useEffect(() => {
+    const fileName = path.split('/').pop() || '';
+    const cached = pageContents[fileName];
+
+    if (cached) {
+      setContent(cached);
+      setError(null);
+      return;
+    }
+
     const controller = new AbortController();
     setError(null);
 
@@ -42,7 +51,7 @@ export default function MarkdownPage({ path }: Props) {
       });
 
     return () => controller.abort();
-  }, [path, isMobile, setIsSidebarExpanded]);
+  }, [path, isMobile, setIsSidebarExpanded, pageContents]);
 
   // Close sidebar on mobile only after content is loaded and painted
   useEffect(() => {

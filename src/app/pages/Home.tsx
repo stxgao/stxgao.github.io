@@ -7,15 +7,15 @@ import { useAppStore } from '../store/useAppStore';
 
 export default function Home() {
   const { pathname } = useLocation();
-  const { setSelectedIndex, isMobile, setExpanded } = useAppStore();
+  const { setSelectedIndex, isMobile, setIsSidebarExpanded } = useAppStore();
   const theme = useTheme();
 
   useEffect(() => {
     setSelectedIndex(-1);
     if (isMobile) {
-      setExpanded(false);
+      setIsSidebarExpanded(false);
     }
-  }, [setSelectedIndex, isMobile, setExpanded]);
+  }, [setSelectedIndex, isMobile, setIsSidebarExpanded]);
 
   useEffect(() => {
     document.title = import.meta.env.VITE_APP_NAME;

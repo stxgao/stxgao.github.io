@@ -1,4 +1,4 @@
-import { Button, Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { VscMarkdown, VscChromeClose } from 'react-icons/vsc';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
@@ -37,7 +37,9 @@ export default function AppTabs({ pages }: Props) {
         role="tab"
         aria-selected={isSelected}
       >
-        <Button
+        <Box
+          role="button"
+          tabIndex={0}
           onClick={() => selectTab(index, navigate)}
           onAuxClick={(e) => {
             if (e.button === 1) {
@@ -46,7 +48,10 @@ export default function AppTabs({ pages }: Props) {
             }
           }}
           onKeyDown={(e) => {
-            if (e.key === 'Delete' || (e.key === 'w' && (e.ctrlKey || e.metaKey))) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              selectTab(index, navigate);
+            } else if (e.key === 'Delete' || (e.key === 'w' && (e.ctrlKey || e.metaKey))) {
               if (e.key === 'w') e.preventDefault(); // Note: browsers usually block Ctrl+W
               closeTab(index, navigate);
             }
@@ -57,7 +62,8 @@ export default function AppTabs({ pages }: Props) {
             height: `calc(${theme.layout.tabHeight} - 1px)`,
             backgroundColor: styles.tabBg,
             color: styles.tabColor,
-            '&.MuiButtonBase-root:hover': {
+            cursor: 'pointer',
+            '&:hover': {
               bgcolor: 'background.default',
               color: 'text.primary',
               '& .close-icon': {
@@ -68,6 +74,11 @@ export default function AppTabs({ pages }: Props) {
             display: 'flex',
             alignItems: 'center',
             textTransform: 'none',
+            userSelect: 'none',
+            outline: 'none',
+            '&:focus-visible': {
+              boxShadow: `inset 0 0 0 1px ${theme.palette.primary.main}`,
+            },
           }}
         >
           <Box
@@ -108,7 +119,7 @@ export default function AppTabs({ pages }: Props) {
           >
             <VscChromeClose fontSize="1rem" />
           </IconButton>
-        </Button>
+        </Box>
       </Box>
     );
   }

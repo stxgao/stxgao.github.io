@@ -1,8 +1,7 @@
 import { Box, IconButton, Link, Tooltip, useTheme } from '@mui/material';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
-import { VscFiles, VscSettingsGear } from 'react-icons/vsc';
-import { AiOutlineRobot } from 'react-icons/ai';
+import { VscFiles, VscSettingsGear, VscChatSparkle } from 'react-icons/vsc';
 import { BiGitBranch } from 'react-icons/bi';
 import Divider from '@mui/material/Divider';
 import { links } from '../constants/links';
@@ -14,8 +13,16 @@ export default function Sidebar() {
   const theme = useTheme();
   const isDarkTheme = theme.palette.mode === 'dark';
 
-  const { expanded, setExpanded, toggleTheme, setSelectedIndex, selectedIndex, isMobile } =
-    useAppStore();
+  const {
+    isSidebarExpanded,
+    setIsSidebarExpanded,
+    toggleTheme,
+    setSelectedIndex,
+    selectedIndex,
+    isMobile,
+    activePanel,
+    setActivePanel,
+  } = useAppStore();
 
   const getIconButtonStyle = (isActive: boolean) => ({
     borderRadius: 0,
@@ -50,11 +57,36 @@ export default function Sidebar() {
         <Tooltip title="Explorer" arrow placement="right">
           <IconButton
             aria-label="Toggle Explorer Panel"
-            onClick={() => setExpanded(!expanded)}
-            sx={getIconButtonStyle(expanded)}
-            aria-expanded={expanded}
+            onClick={() => {
+              if (activePanel === 'explorer' && isSidebarExpanded) {
+                setIsSidebarExpanded(false);
+              } else {
+                setActivePanel('explorer');
+                setIsSidebarExpanded(true);
+              }
+            }}
+            sx={getIconButtonStyle(isSidebarExpanded && activePanel === 'explorer')}
+            aria-expanded={isSidebarExpanded && activePanel === 'explorer'}
           >
             <VscFiles />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="AI Assistant" arrow placement="right">
+          <IconButton
+            aria-label="Toggle AI Assistant Panel"
+            onClick={() => {
+              if (activePanel === 'aiAssistant' && isSidebarExpanded) {
+                setIsSidebarExpanded(false);
+              } else {
+                setActivePanel('aiAssistant');
+                setIsSidebarExpanded(true);
+              }
+            }}
+            sx={getIconButtonStyle(isSidebarExpanded && activePanel === 'aiAssistant')}
+            aria-expanded={isSidebarExpanded && activePanel === 'aiAssistant'}
+          >
+            <VscChatSparkle />
           </IconButton>
         </Tooltip>
 
@@ -155,7 +187,7 @@ export default function Sidebar() {
             aria-label="View Markdown Documentation"
             onClick={() => {
               if (selectedIndex === 0 && isMobile) {
-                setExpanded(false);
+                setIsSidebarExpanded(false);
                 return;
               }
               setSelectedIndex(0);

@@ -1,9 +1,10 @@
 import { Box, CssBaseline, ThemeProvider } from '@mui/material';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import AppTree from './AppTree';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
 import AppTabs from './AppTabs';
+import AIAssistant from './AIAssistant';
 import AppRoutes from './AppRoutes';
 import { pages } from '../constants/pages';
 import usePageTracking from '../hooks/usePageTracking';
@@ -25,7 +26,12 @@ export default function App() {
   useRouteSync();
   usePageTracking();
 
-  const { expanded, visiblePageIndexes, panelWidth, isMobile } = useAppStore();
+  const { isSidebarExpanded, visiblePageIndexes, activePanel, panelWidth, isMobile, preloadPages } =
+    useAppStore();
+
+  useEffect(() => {
+    preloadPages();
+  }, [preloadPages]);
 
   const visiblePages = useMemo(
     () =>
@@ -62,32 +68,34 @@ export default function App() {
             <Sidebar />
           </Box>
 
-          {/* Side Panel (Explorer) */}
+          {/* Side Panel (Explorer / AI Assistant) */}
           <Box
             component="aside"
             sx={{
               backgroundColor: 'background.paper',
-              width: isMobile ? `calc(100vw - ${theme.layout.sidebarWidth})` : panelWidth,
-              minWidth: isMobile ? 'unset' : theme.layout.panelMinWidth,
+              width: isSidebarExpanded
+                ? isMobile
+                  ? `calc(100vw - ${theme.layout.sidebarWidth})`
+                  : panelWidth
+                : 0,
+              minWidth: isSidebarExpanded ? (isMobile ? 'unset' : theme.layout.panelMinWidth) : 0,
               maxWidth: isMobile ? 'unset' : '50vw',
               position: 'relative',
-              borderRight: isMobile ? 1 : 0,
+              borderRight: isSidebarExpanded ? 1 : 0,
               borderColor: 'divider',
               height: '100%',
-              display: expanded ? 'flex' : 'none',
+              display: 'flex',
               flexDirection: 'column',
               flexShrink: 0,
+              overflow: 'hidden',
+              opacity: isSidebarExpanded ? 1 : 0,
+              transition: theme.transitions.create(['width', 'min-width', 'opacity'], {
+                duration: theme.transitions.duration.shortest,
+              }),
             }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-              }}
-            >
-              <AppTree />
-            </Box>
+            {activePanel === 'explorer' && <AppTree />}
+            {activePanel === 'aiAssistant' && <AIAssistant />}
 
             {/* Resizer Handle */}
             {!isMobile && (
@@ -117,13 +125,12 @@ export default function App() {
             )}
           </Box>
 
-          {/* Main Content Area */}
           <Box
             component="main"
             sx={{
               flexGrow: 1,
               minWidth: 0, // Ensure flexbox can shrink below content width
-              display: isMobile && expanded ? 'none' : 'flex',
+              display: 'flex',
               flexDirection: 'column',
             }}
           >
