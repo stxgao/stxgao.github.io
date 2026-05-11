@@ -7,10 +7,7 @@ const usePageTracking = () => {
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    if (
-      !window.location.href.includes('localhost') &&
-      import.meta.env.VITE_APP_MEASUREMENT_ID
-    ) {
+    if (!window.location.href.includes('localhost') && import.meta.env.VITE_APP_MEASUREMENT_ID) {
       ReactGA.initialize(import.meta.env.VITE_APP_MEASUREMENT_ID);
       setInitialized(true);
     }

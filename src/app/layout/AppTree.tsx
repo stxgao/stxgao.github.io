@@ -1,83 +1,136 @@
-import * as React from "react";
+import React from 'react';
 import { TreeView } from '@mui/x-tree-view/TreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { useNavigate } from "react-router-dom";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { useNavigate } from 'react-router-dom';
 
-import { useTheme } from "@mui/material/styles";
-import { VscMarkdown } from "react-icons/vsc";
-import { useAppStore } from "../store/useAppStore";
-import { pages } from "../pages/pages";
+import { useTheme } from '@mui/material/styles';
+import { VscMarkdown } from 'react-icons/vsc';
+import { Typography, Box } from '@mui/material';
+import { useAppStore } from '../store/useAppStore';
+import { pages } from '../constants/pages';
 
 export default function AppTree() {
   const visiblePages = pages.filter((x) => x.visible);
   const navigate = useNavigate();
   const theme = useTheme();
-  const { selectedIndex, currentComponent, selectTab, setSelectedIndex } = useAppStore();
+  const { selectedIndex, currentComponent, selectTab, setSelectedIndex, setExpanded, isMobile } =
+    useAppStore();
 
-  function renderTreeItemBgColor(index: number) {
-    if (theme.palette.mode === "dark") {
-      return selectedIndex === index ? "rgba(144,202,249,0.16)" : "#252527";
-    } else {
-      return selectedIndex === index ? "#295fbf" : "#f3f3f3";
-    }
-  }
-
-  function renderTreeItemColor(index: number) {
-    if (theme.palette.mode === "dark") {
-      return selectedIndex === index && currentComponent === "tree"
-        ? "white"
-        : "#bdc3cf";
-    } else {
-      return selectedIndex === index ? "#e2ffff" : "#69665f";
-    }
-  }
+  const getItemColor = (index: number) => {
+    const isSelected = selectedIndex === index;
+    const isTreeActive = currentComponent === 'tree';
+    // Only use active text color if selected AND the tree is the active component
+    return isSelected && isTreeActive ? 'text.primary' : 'text.secondary';
+  };
 
   function clickHandler(event: React.SyntheticEvent, nodeId: string) {
     const index = parseInt(nodeId);
+
+    // If already on this page, just close the sidebar on mobile
+    if (index === selectedIndex) {
+      if (isMobile) setExpanded(false);
+      return;
+    }
+
     if (index === -1) {
-      navigate("/");
+      navigate('/');
       setSelectedIndex(-1);
     } else {
       selectTab(index, navigate, 'tree');
     }
   }
 
+  const renderHomeLabel = (text: string) => (
+    <Typography fontWeight="bold" sx={{ color: 'text.secondary' }}>
+      {text}
+    </Typography>
+  );
+
   return (
-    <TreeView
-      aria-label="file system navigator"
-      defaultCollapseIcon={<ExpandMoreIcon />}
-      defaultExpandIcon={<ChevronRightIcon />}
-      sx={{ minWidth: 220, minHeight: 200, flexGrow: 1 }}
-      expanded={["-1"]}
-      onNodeSelect={clickHandler}
-    >
-      <TreeItem
-        key={-1}
-        nodeId="-1"
-        label="Home"
-        color="#bdc3cf"
-        aria-label="View Home Page"
-        aria-selected={selectedIndex === -1}
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Box
+        sx={{
+          height: theme.layout.tabHeight,
+          display: 'flex',
+          alignItems: 'center',
+          ml: 3,
+          py: 1,
+          flexShrink: 0,
+        }}
       >
-        {visiblePages.map(({ index, name }) => (
-          <TreeItem
-            key={index}
-            nodeId={index.toString()}
-            label={name}
-            sx={{
-              color: renderTreeItemColor(index),
-              backgroundColor: renderTreeItemBgColor(index),
-              "&& .Mui-selected": {
-                backgroundColor: renderTreeItemBgColor(index),
+        <Typography variant="caption" color="text.secondary">
+          EXPLORER
+        </Typography>
+      </Box>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+        <TreeView
+          aria-label="file system navigator"
+          defaultCollapseIcon={<ExpandMoreIcon />}
+          defaultExpandIcon={<ChevronRightIcon />}
+          selected={selectedIndex.toString()}
+          sx={{
+            minWidth: 200,
+            flexGrow: 1,
+            // Remove the default indentation of nested groups to allow full-width background
+            '& .MuiTreeItem-group': {
+              ml: 0,
+            },
+            // Apply manual indentation to the content via padding
+            '& .MuiTreeItem-root .MuiTreeItem-group .MuiTreeItem-content': {
+              pl: 3,
+            },
+            // Shift the root HOME item back 8px
+            '& > .MuiTreeItem-root > .MuiTreeItem-content': {
+              pl: 0,
+            },
+            // Center the chevron icon by shifting it right by 4px
+            '& > .MuiTreeItem-root:first-of-type > .MuiTreeItem-content .MuiTreeItem-iconContainer':
+              {
+                pl: 1,
               },
-            }}
-            icon={<VscMarkdown color="#6997d5" />}
-            aria-selected={selectedIndex === index}
-          />
-        ))}
-      </TreeItem>
-    </TreeView>
+            // Ensure text starts exactly after the 24px icon container
+            '& .MuiTreeItem-label': {
+              pl: 0,
+            },
+            // Centralized background styling to prevent double-hover/conflicts
+            '& .MuiTreeItem-content': {
+              '&:hover': {
+                backgroundColor: 'action.hover',
+              },
+              '&.Mui-selected': {
+                backgroundColor: 'action.selected',
+                '&:hover': {
+                  backgroundColor: 'action.selected',
+                },
+              },
+            },
+          }}
+          defaultExpanded={['-1']}
+          onNodeSelect={clickHandler}
+        >
+          <TreeItem
+            key={-1}
+            nodeId="-1"
+            label={renderHomeLabel('HOME')}
+            aria-label="View Home Page"
+            sx={{ color: 'text.secondary' }}
+          >
+            {visiblePages.map(({ index, name }) => {
+              return (
+                <TreeItem
+                  key={index}
+                  nodeId={index.toString()}
+                  label={name}
+                  sx={{ color: getItemColor(index) }}
+                  icon={<VscMarkdown color={theme.palette.markdownIcon} />}
+                />
+              );
+            })}
+          </TreeItem>
+        </TreeView>
+      </Box>
+    </Box>
   );
 }

@@ -1,25 +1,21 @@
-import {
-  Box,
-  Grid,
-  IconButton,
-  Link,
-  Stack,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import React, { useEffect } from "react";
-import logo from "../../static/favicon.png";
-import { useLocation } from "react-router-dom";
-import { links } from "./links";
-import { useAppStore } from "../store/useAppStore";
+import { Box, Grid, IconButton, Link, Stack, Tooltip, Typography, useTheme } from '@mui/material';
+import { useEffect } from 'react';
+import logo from '../../static/favicon.png';
+import { useLocation } from 'react-router-dom';
+import { links } from '../constants/links';
+import { useAppStore } from '../store/useAppStore';
 
 export default function Home() {
   const { pathname } = useLocation();
-  const { setSelectedIndex } = useAppStore();
-  
+  const { setSelectedIndex, isMobile, setExpanded } = useAppStore();
+  const theme = useTheme();
+
   useEffect(() => {
     setSelectedIndex(-1);
-  }, [setSelectedIndex]);
+    if (isMobile) {
+      setExpanded(false);
+    }
+  }, [setSelectedIndex, isMobile, setExpanded]);
 
   useEffect(() => {
     document.title = import.meta.env.VITE_APP_NAME;
@@ -32,44 +28,54 @@ export default function Home() {
       direction="column"
       alignItems="center"
       justifyContent="center"
-      sx={{ minHeight: `calc(100vh - 20px - 33px)` }}
+      sx={{ height: '100%' }}
     >
       <Grid item xs={3}>
-        <Stack direction={{ xs: "column", sm: "row-reverse" }} spacing={2}>
+        <Stack direction={{ xs: 'column', sm: 'row-reverse' }} spacing={2}>
           <Box>
-            <Box display="flex" sx={{ justifyContent: "center" }}>
-              <img src={logo} style={{ borderRadius: "50%", width: "250px", height: "250px" }} alt="Steven's Headshot" />
+            <Box display="flex" sx={{ justifyContent: 'center' }}>
+              <img
+                src={logo}
+                style={{ borderRadius: '50%', width: '250px', height: '250px' }}
+                alt="Steven's Headshot"
+              />
             </Box>
-            <Grid
-              display="flex"
-              justifyContent={{ xs: "center", sm: "center" }}
-            >
-              <Typography variant="h3">{import.meta.env.VITE_APP_NAME}</Typography>
-            </Grid>
-            <Grid
-              display="flex"
-              justifyContent={{ xs: "center", sm: "center" }}
-            >
-              <Typography variant="subtitle1" gutterBottom>
-                Software Engineer, UI/UX
-                📍 San Francisco
+            <Grid display="flex" justifyContent={{ xs: 'center', sm: 'center' }}>
+              <Typography variant="h3" sx={{ color: 'text.primary' }}>
+                {import.meta.env.VITE_APP_NAME}
               </Typography>
             </Grid>
-            <Grid
-              display="flex"
-              justifyContent={{ xs: "center", sm: "center" }}
-            >
+            <Grid display="flex" justifyContent={{ xs: 'center', sm: 'center' }}>
+              <Typography variant="subtitle1" gutterBottom sx={{ color: 'text.secondary' }}>
+                Software Engineer, UI/UX 📍 San Francisco
+              </Typography>
+            </Grid>
+            <Grid display="flex" justifyContent={{ xs: 'center', sm: 'center' }}>
               <Stack direction="row" spacing={0.4}>
                 {links.map((link) => (
                   <Tooltip key={link.index} title={link.title} arrow>
-                    <Link
-                      target="_blank"
+                    <IconButton
+                      component="a"
                       href={link.href}
-                      underline="none"
-                      color="inherit"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="large"
+                      onKeyDown={(e) => {
+                        if (e.key === ' ') {
+                          e.preventDefault();
+                          window.open(link.href, '_blank', 'noopener,noreferrer');
+                        }
+                      }}
+                      sx={{
+                        color: 'text.secondary',
+                        '&:hover': {
+                          color: 'text.primary',
+                        },
+                      }}
+                      aria-label={link.title}
                     >
-                      <IconButton size="large" color="inherit">{link.icon}</IconButton>
-                    </Link>
+                      {link.icon}
+                    </IconButton>
                   </Tooltip>
                 ))}
               </Stack>

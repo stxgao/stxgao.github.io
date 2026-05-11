@@ -107,7 +107,7 @@ The pages of the portfolio are powered by `markdown`, which make them easy to mo
    VITE_APP_NAME=<your_name>
    ```
 4. Add your markdown pages in `public/pages`
-5. Add your routes in `src/app/pages/pages.ts`, make sure the names of the pages are consistent with the markdown files.
+5. Add your routes in `src/app/pages/pages.tsx`, make sure the names of the pages are consistent with the markdown files.
     ```ts
     export const pages = [
       { index: 0, name: 'docs.md', route: '/docs', visible: false },
@@ -124,8 +124,8 @@ The pages of the portfolio are powered by `markdown`, which make them easy to mo
     export const links = [
       {
         index: 0,
-        title: "Find me on Github",
-        href: "https://github.com/stxgao",
+        title: 'Find me on Github',
+        href: 'https://github.com/stxgao',
         icon: <FaGithub />,
       },
     ];
