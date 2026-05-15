@@ -33,7 +33,7 @@ export interface AILanguageModel {
 }
 
 export interface AILanguageModelFactory {
-  availability(options?: { languages?: string[] }): Promise<AICapabilityAvailability>;
+  availability(): Promise<AICapabilityAvailability>;
   capabilities(): Promise<AILanguageModelCapabilities>;
   create(options?: AILanguageModelCreateOptions): Promise<AILanguageModel>;
 }

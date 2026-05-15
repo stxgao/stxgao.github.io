@@ -6,22 +6,33 @@ interface ChatMessageBubbleProps {
   role: 'user' | 'assistant';
   content?: string;
   children?: React.ReactNode;
+  hideLabel?: boolean;
 }
 
-export default function ChatMessageBubble({ role, content, children }: ChatMessageBubbleProps) {
+export default function ChatMessageBubble({
+  role,
+  content,
+  children,
+  hideLabel = false,
+}: ChatMessageBubbleProps) {
   const theme = useTheme();
 
   return (
     <Box
-      sx={{ alignSelf: role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '85%' }}
+      sx={{
+        alignSelf: role === 'user' ? 'flex-end' : 'flex-start',
+        maxWidth: '85%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 0.5,
+      }}
       aria-label={`${role === 'user' ? 'User' : 'Assistant'} message`}
     >
-      <Typography
-        variant="caption"
-        sx={{ color: 'text.secondary', mb: 0.5, display: 'block', px: 1 }}
-      >
-        {role === 'user' ? 'You' : 'AI Assistant'}
-      </Typography>
+      {!hideLabel && (
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', px: 1 }}>
+          {role === 'user' ? 'You' : 'AI Assistant'}
+        </Typography>
+      )}
       <Box
         sx={{
           bgcolor: role === 'user' ? 'action.selected' : 'background.default',
@@ -32,11 +43,7 @@ export default function ChatMessageBubble({ role, content, children }: ChatMessa
           ml: role === 'assistant' ? 0 : 'auto',
         }}
       >
-        {content ? (
-          <MarkdownRenderer content={content} sanitize={true} variant="compact" />
-        ) : (
-          children
-        )}
+        {content ? <MarkdownRenderer content={content} variant="compact" /> : children}
       </Box>
     </Box>
   );

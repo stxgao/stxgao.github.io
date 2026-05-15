@@ -16,7 +16,8 @@ import {
   Typography,
 } from '@mui/material';
 import { ReactElement, useMemo } from 'react';
-import ReactMarkdown, { Components } from 'react-markdown';
+import { Streamdown } from 'streamdown';
+import type { Components } from 'streamdown';
 import rehypeRaw from 'rehype-raw';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
@@ -24,7 +25,10 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { materialLight, materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme, styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
-import DOMPurify from 'dompurify';
+import { useNavigate } from 'react-router-dom';
+import { useAppStore } from '../store/useAppStore';
+import { pages } from '../constants/pages';
+import { VscMarkdown } from 'react-icons/vsc';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -48,31 +52,123 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 interface MarkdownRendererProps {
   content: string;
   variant?: 'default' | 'compact';
-  sanitize?: boolean;
 }
 
-export default function MarkdownRenderer({
-  content,
-  variant = 'default',
-  sanitize = false,
-}: MarkdownRendererProps) {
+export default function MarkdownRenderer({ content, variant = 'default' }: MarkdownRendererProps) {
   const theme = useTheme();
+  const navigate = useNavigate();
+  const selectTab = useAppStore((state) => state.selectTab);
   const isDarkTheme = theme.palette.mode === 'dark';
   const isCompact = variant === 'compact';
 
-  const processedContent = useMemo(() => {
-    if (sanitize) {
-      return DOMPurify.sanitize(content);
-    }
-    return content;
-  }, [content, sanitize]);
+  /**
+   * Helper to process text nodes for custom [[citation]] logic.
+   */
+  const processTextForCitations = useMemo(
+    () => (children: any) => {
+      const childrenArray = Array.isArray(children) ? children : [children];
+      return childrenArray.flatMap((child, i) => {
+        if (typeof child === 'string') {
+          const parts = child.split(/(\[\[\s*[a-zA-Z0-9._-]+\s*(?:\.md)?\s*\]\])/g);
+          return parts.map((part, j) => {
+            const match = part.match(/\[\[\s*([a-zA-Z0-9._-]+)(?:\.md)?\s*\]\]/);
+            if (match) {
+              const fileName = match[1].trim();
+              const page = pages.find(
+                (p) =>
+                  p.name.toLowerCase() === fileName.toLowerCase() ||
+                  p.name.toLowerCase() === `${fileName.toLowerCase()}.md`,
+              );
+
+              return (
+                <Chip
+                  key={`${i}-${j}`}
+                  label={page ? page.name : fileName}
+                  size="small"
+                  icon={<VscMarkdown />}
+                  onClick={page ? () => selectTab(page.index, navigate, 'ai') : undefined}
+                  clickable={!!page}
+                  sx={{
+                    mx: 0.5,
+                    height: 20,
+                    fontSize: '0.75rem',
+                    bgcolor: 'action.selected',
+                    '& .MuiChip-icon': {
+                      color: 'markdownIcon',
+                      fontSize: '0.9rem',
+                    },
+                    '&:hover': { bgcolor: 'action.hover' },
+                    verticalAlign: 'middle',
+                    cursor: page ? 'pointer' : 'default',
+                  }}
+                />
+              );
+            }
+            return part;
+          });
+        }
+        return child;
+      });
+    },
+    [navigate, selectTab],
+  );
 
   const components: Components = useMemo(
     () => ({
       a: ({ href, children }) => (
-        <Link href={href} target="_blank" underline="hover">
+        <Link
+          href={href}
+          target="_blank"
+          underline="hover"
+          sx={{ color: 'primary.main', fontWeight: 500 }}
+        >
           {children}
         </Link>
+      ),
+      strong: ({ children }) => (
+        <Box component="strong" sx={{ fontWeight: 'bold', display: 'inline' }}>
+          {children}
+        </Box>
+      ),
+      b: ({ children }) => (
+        <Box component="b" sx={{ fontWeight: 'bold', display: 'inline' }}>
+          {children}
+        </Box>
+      ),
+      em: ({ children }) => (
+        <Box component="em" sx={{ fontStyle: 'italic', display: 'inline' }}>
+          {children}
+        </Box>
+      ),
+      i: ({ children }) => (
+        <Box component="i" sx={{ fontStyle: 'italic', display: 'inline' }}>
+          {children}
+        </Box>
+      ),
+      del: ({ children }) => (
+        <Box component="del" sx={{ textDecoration: 'line-through', display: 'inline' }}>
+          {children}
+        </Box>
+      ),
+      kbd: ({ children }) => (
+        <Box
+          component="kbd"
+          sx={{
+            px: 0.5,
+            py: 0.2,
+            bgcolor: 'action.selected',
+            border: 1,
+            borderColor: 'divider',
+            borderRadius: 1,
+            fontSize: '0.85em',
+            fontFamily: 'monospace',
+            display: 'inline-block',
+            lineHeight: 1,
+            verticalAlign: 'middle',
+          }}
+        >
+          {children}
+        </Box>
       ),
       img: ({ src, alt }) => {
         if (!src) return null;
@@ -202,6 +298,35 @@ export default function MarkdownRenderer({
           <Divider sx={{ mb: isCompact ? 1 : 2 }} />
         </>
       ),
+      h3: ({ children }) => (
+        <Typography
+          variant="h3"
+          sx={{
+            fontSize: isCompact ? '0.9rem' : '1.25em',
+            display: 'block',
+            marginBlockStart: isCompact ? '0.5em' : '1em',
+            marginBlockEnd: '0.3em',
+            fontWeight: 'bold',
+            lineHeight: 1.25,
+          }}
+        >
+          {children}
+        </Typography>
+      ),
+      h4: ({ children }) => (
+        <Typography
+          variant="h4"
+          sx={{
+            fontSize: isCompact ? '0.85rem' : '1.1em',
+            display: 'block',
+            marginBlockStart: '1em',
+            marginBlockEnd: '0.3em',
+            fontWeight: 'bold',
+          }}
+        >
+          {children}
+        </Typography>
+      ),
       blockquote: ({ children }) => (
         <Box
           sx={{
@@ -242,15 +367,11 @@ export default function MarkdownRenderer({
           );
         }
 
-        /**
-         * Check if children contain any block-level elements that shouldn't be inside a <p>.
-         * react-markdown often wraps block components (like our custom code/table) in <p>
-         * if they are not separated by enough newlines.
-         */
+        const renderedChildren = processTextForCitations(children);
+
         const hasBlockElement = childrenArray.some((child) => {
           if (child && typeof child === 'object' && 'type' in child) {
             const type = (child as any).type;
-            // If it's a component or a tag that we know renders a div/table/etc.
             return (
               type === 'code' ||
               type === 'table' ||
@@ -275,7 +396,7 @@ export default function MarkdownRenderer({
               '&:last-child': { mb: 0 },
             }}
           >
-            {children}
+            {renderedChildren}
           </Typography>
         );
       },
@@ -295,19 +416,29 @@ export default function MarkdownRenderer({
         ) : (
           <ol>{children}</ol>
         ),
-      li: ({ children }) => (
-        <Box component="li" sx={{ mb: isCompact ? 0.5 : 0 }}>
-          {children}
-        </Box>
-      ),
+      li: ({ children }) => {
+        const childrenArray = Array.isArray(children) ? children : [children];
+        const hasContent = childrenArray.some((child) => {
+          if (typeof child === 'string') return child.trim().length > 0;
+          return child !== null && child !== undefined;
+        });
+
+        if (!hasContent) return null;
+
+        return (
+          <Box component="li" sx={{ mb: isCompact ? 0.5 : 0 }}>
+            {processTextForCitations(children)}
+          </Box>
+        );
+      },
       hr: () => <Divider sx={{ my: isCompact ? 1 : 2, opacity: isCompact ? 0.5 : 1 }} />,
     }),
-    [isDarkTheme, isCompact],
+    [isDarkTheme, isCompact, navigate, selectTab],
   );
 
   return (
-    <ReactMarkdown
-      children={processedContent}
+    <Streamdown
+      children={content}
       components={components}
       remarkPlugins={[remarkGfm, remarkBreaks]}
       rehypePlugins={[rehypeRaw]}

@@ -1,7 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AICapabilityAvailability, AILanguageModel } from '../types/ai';
-import { SYSTEM_PROMPT, AI_GREETING } from '../constants/ai';
+import {
+  AICapabilityAvailability,
+  AILanguageModel,
+  AILanguageModelFactory,
+  AILanguageModelCreateOptions,
+} from '../types/ai';
+import { SYSTEM_PROMPT, AI_GREETING, FEW_SHOT_EXAMPLES } from '../constants/ai';
 
 export interface Message {
   role: 'user' | 'assistant';
@@ -17,7 +22,7 @@ interface AIState {
   downloadProgress: number;
 
   // Actions
-  initAI: () => Promise<void>;
+  initAI: (isMobile?: boolean) => Promise<void>;
   handleSend: (input: string, context?: string) => Promise<void>;
   handleStop: () => void;
   handleDownload: (context?: string) => Promise<void>;
@@ -36,19 +41,32 @@ const DEFAULT_MESSAGES: Message[] = [
  * Helper to create a session with initial context.
  */
 async function createAISession(
-  LLM: any,
+  LLM: AILanguageModelFactory,
   signal?: AbortSignal,
   context?: string,
   onProgress?: (e: any) => void,
-) {
-  const initialPrompts: any[] = [
+  previousMessages: Message[] = [],
+): Promise<AILanguageModel> {
+  // Best Practice: Embed examples directly into the system block to prevent
+  // the model from treating them as active conversation history.
+  const examplesBlock = FEW_SHOT_EXAMPLES.map(
+    (ex) => `[${ex.role.toUpperCase()} EXAMPLE]\n${ex.content}`,
+  ).join('\n\n');
+
+  const consolidatedSystemPrompt = `${SYSTEM_PROMPT}\n\n### PORTFOLIO CONTEXT\n${context || 'No specific portfolio context provided.'}\n\n### FEW-SHOT EXAMPLES\n${examplesBlock}`;
+
+  const initialPrompts: AILanguageModelCreateOptions['initialPrompts'] = [
     {
       role: 'system',
-      content: SYSTEM_PROMPT + (context ? `\n\nPORTFOLIO CONTEXT:\n${context}` : ''),
+      content: consolidatedSystemPrompt,
     },
+    ...previousMessages.map((msg) => ({
+      role: msg.role,
+      content: msg.content,
+    })),
   ];
 
-  const options: any = {
+  const options: AILanguageModelCreateOptions = {
     initialPrompts,
     signal,
   };
@@ -59,7 +77,31 @@ async function createAISession(
     };
   }
 
-  return await LLM.create(options);
+  try {
+    return await LLM.create(options);
+  } catch (e: any) {
+    if (e.name === 'QuotaExceededError' || (e.message && e.message.includes('Quota'))) {
+      console.warn('Context window exceeded, retrying with essential context...');
+
+      // Isolate high-signal documents for essential context fallback
+      const homeMatch = context?.match(/<document name="home\.md">[\s\S]*?<\/document>/);
+      const overviewMatch = context?.match(/<document name="overview\.md">[\s\S]*?<\/document>/);
+      const readmeMatch = context?.match(/<document name="README\.md">[\s\S]*?<\/document>/);
+
+      const essentialContext = [homeMatch?.[0], overviewMatch?.[0], readmeMatch?.[0]]
+        .filter(Boolean)
+        .join('\n\n');
+
+      const retrySystemPrompt = `${SYSTEM_PROMPT}\n\n### PORTFOLIO CONTEXT (ESSENTIAL)\n${essentialContext}\n\n### FEW-SHOT EXAMPLES\n${examplesBlock}`;
+
+      if (options.initialPrompts && options.initialPrompts[0]) {
+        options.initialPrompts[0].content = retrySystemPrompt;
+      }
+
+      return await LLM.create(options);
+    }
+    throw e;
+  }
 }
 
 /**
@@ -82,8 +124,22 @@ export const useAIStore = create<AIState>()(
         set({ messages });
       },
 
-      initAI: async () => {
+      initAI: async (isMobile?: boolean) => {
         try {
+          if (isMobile) {
+            set({ aiStatus: 'unavailable' });
+            if (get().messages.length <= 1) {
+              get().setMessages([
+                {
+                  role: 'assistant',
+                  content:
+                    "Chrome's built-in **Gemini Nano** AI is currently optimized for desktop environments. Launch this application from a desktop browser to engage with the on-device AI Assistant.",
+                },
+              ]);
+            }
+            return;
+          }
+
           const LLM = window.LanguageModel || window.ai?.languageModel;
           if (!LLM) {
             set({ aiStatus: 'unavailable' });
@@ -92,7 +148,7 @@ export const useAIStore = create<AIState>()(
                 {
                   role: 'assistant',
                   content:
-                    "This feature uses Google's Gemini Nano API. Please use an up-to-date version of Chrome and enable the experimental flags to access it.",
+                    "This AI Assistant leverages Chrome's built-in **Gemini Nano** AI for local, on-device inference. Since this is an experimental feature, it needs to be enabled manually via browser flags. [See the setup guide here](https://developer.chrome.com/docs/ai/get-started).",
                 },
               ]);
             }
@@ -108,7 +164,7 @@ export const useAIStore = create<AIState>()(
                 {
                   role: 'assistant',
                   content:
-                    "Your device does not currently support Chrome's Gemini Nano AI model (insufficient hardware or disabled flags).",
+                    'Gemini Nano AI: **Offline**. The device or requested session configuration is not supported at this moment. This usually resolves after a browser restart or component update in `chrome://components`.',
                 },
               ]);
             }
@@ -127,7 +183,7 @@ export const useAIStore = create<AIState>()(
                 {
                   role: 'assistant',
                   content:
-                    'Gemini Nano is supported on your device, but the LLM (gemma-2b-it-gpu-int4.bin) needs to be downloaded first (~1.35 GB).',
+                    'Environment validated for **Gemini Nano** AI. To create an active session, the browser must provision additional assets, including the base LLM and fine-tuning weights. Provision the **Gemini Nano** AI below to begin.',
                 },
               ]);
             }
@@ -136,7 +192,8 @@ export const useAIStore = create<AIState>()(
               get().setMessages([
                 {
                   role: 'assistant',
-                  content: 'Model download is currently in progress in the background...',
+                  content:
+                    'Provisioning **Gemini Nano** model weights. Once finished, Chrome will use your device to handle AI inference locally.',
                 },
               ]);
             }
@@ -161,13 +218,16 @@ export const useAIStore = create<AIState>()(
 
         if (get().isGenerating) return;
 
+        const assistantMsgId = crypto.randomUUID();
         const currentMessages = get().messages;
-        const newMessages: Message[] = [...currentMessages, { role: 'user', content: userMsg }];
+        const newMessages: Message[] = [
+          ...currentMessages,
+          { role: 'user', content: userMsg },
+          { role: 'assistant', content: '', id: assistantMsgId },
+        ];
         get().setMessages(newMessages);
 
         set({ isThinking: true, isGenerating: true });
-
-        const assistantMsgId = crypto.randomUUID();
 
         // Abort any existing request before starting a new one
         if (abortController) {
@@ -182,7 +242,7 @@ export const useAIStore = create<AIState>()(
           if (!LLM) throw new Error('Not Supported');
 
           if (!session) {
-            session = await createAISession(LLM, signal, context);
+            session = await createAISession(LLM, signal, context, undefined, currentMessages);
           }
 
           if (!session) {
@@ -198,11 +258,6 @@ export const useAIStore = create<AIState>()(
           for await (const chunk of stream) {
             if (isFirstChunk) {
               set({ isThinking: false });
-              const messagesWithAssistant: Message[] = [
-                ...get().messages,
-                { role: 'assistant', content: '', id: assistantMsgId },
-              ];
-              set({ messages: messagesWithAssistant });
               isFirstChunk = false;
             }
 
@@ -299,7 +354,11 @@ export const useAIStore = create<AIState>()(
           abortController = null;
         }
         if (session) {
-          session.destroy();
+          try {
+            session.destroy();
+          } catch (e) {
+            console.warn('Failed to destroy AI session:', e);
+          }
           session = null;
         }
         const defaultMsg: Message = {

@@ -267,33 +267,33 @@ export const useAppStore = create<AppState>()(
       },
 
       closeTab: (index, navigate) => {
-        set((state) => {
-          const newVisible = state.visiblePageIndexes.filter((x) => x !== index);
-          const newHistory = state.tabHistory.filter((x) => x !== index);
+        const { visiblePageIndexes, tabHistory, selectedIndex } = get();
+        const newVisible = visiblePageIndexes.filter((x) => x !== index);
+        const newHistory = tabHistory.filter((x) => x !== index);
 
-          if (newVisible.length === 0) {
+        if (newVisible.length === 0) {
+          set({ visiblePageIndexes: [], tabHistory: [], selectedIndex: -1 });
+          navigate('/');
+          return;
+        }
+
+        if (selectedIndex === index) {
+          const fallbackIndex =
+            newHistory.length > 0 ? newHistory[newHistory.length - 1] : newVisible[0];
+          const fallbackPage = pages.find((p) => p.index === fallbackIndex);
+          if (fallbackPage) {
+            navigate(fallbackPage.route);
+          } else {
             navigate('/');
-            return { visiblePageIndexes: newVisible, tabHistory: newHistory, selectedIndex: -1 };
           }
-
-          if (state.selectedIndex === index) {
-            // VSCode MRU fallback: pick the most recently used remaining tab
-            const fallbackIndex =
-              newHistory.length > 0
-                ? newHistory[newHistory.length - 1]
-                : newVisible[newVisible.length - 1];
-            const fallbackPage = pages.find((p) => p.index === fallbackIndex);
-            if (fallbackPage) navigate(fallbackPage.route);
-            return {
-              visiblePageIndexes: newVisible,
-              tabHistory: newHistory,
-              selectedIndex: fallbackIndex,
-            };
-          }
-
-          // Closing a background tab — no navigation needed
-          return { visiblePageIndexes: newVisible, tabHistory: newHistory };
-        });
+          set({
+            visiblePageIndexes: newVisible,
+            tabHistory: newHistory,
+            selectedIndex: fallbackIndex ?? -1,
+          });
+        } else {
+          set({ visiblePageIndexes: newVisible, tabHistory: newHistory });
+        }
       },
     }),
     {

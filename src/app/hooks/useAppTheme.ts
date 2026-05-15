@@ -35,8 +35,19 @@ const LAYOUT: VsCodeLayout = {
   statusBarLeftWidth: '200px',
 };
 
+/**
+ * BRAND PALETTE (VS Code Blue Harmony)
+ * We use different shades of the same Blue hue to ensure brand consistency
+ * while maintaining WCAG contrast ratios across light and dark modes.
+ */
+const BRAND_BLUE = {
+  light: '#295fbf', // Deep Navy (Contrast for light backgrounds)
+  mid: '#1675e0', // Pure Brand Blue (Used for solid blocks like Footer)
+  dark: '#3794ef', // Sky Blue (Contrast for dark backgrounds)
+};
+
 const SHARED = {
-  footerRemoteBg: '#1675e0',
+  footerRemoteBg: BRAND_BLUE.mid,
   footerRemoteHoverBg: '#2b8dfa',
   footerHoverBg: 'rgba(255, 255, 255, 0.1)',
   footerRemoteText: '#e1e1e1',
@@ -57,7 +68,7 @@ const THEME_DATA = {
     tabCloseHover: '#333c43',
     scrollbarSlider: 'rgba(121, 121, 121, 0.4)',
     scrollbarSliderHover: 'rgba(100, 100, 100, 0.7)',
-    primaryMain: '#e1e1e1', // High contrast for dark mode
+    primaryMain: BRAND_BLUE.dark,
   },
   light: {
     ...SHARED,
@@ -71,7 +82,7 @@ const THEME_DATA = {
     tabCloseHover: '#dadada',
     scrollbarSlider: 'rgba(100, 100, 100, 0.4)',
     scrollbarSliderHover: 'rgba(0, 0, 0, 0.6)',
-    primaryMain: '#295fbf', // Brand blue for light mode
+    primaryMain: BRAND_BLUE.light,
   },
 };
 

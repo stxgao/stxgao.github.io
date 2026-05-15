@@ -80,7 +80,7 @@ export default function MarkdownPage({ path }: Props) {
           {error}
         </Alert>
       ) : (
-        <MarkdownRenderer content={content} sanitize={false} variant="default" />
+        <MarkdownRenderer content={content} variant="default" />
       )}
     </Container>
   );

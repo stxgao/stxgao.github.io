@@ -10,28 +10,18 @@ import {
   Stack,
   styled,
   keyframes,
+  Chip,
 } from '@mui/material';
-import { VscSend, VscTrash, VscCloudDownload, VscDebugStop } from 'react-icons/vsc';
-import { useState, useRef, useEffect } from 'react';
+import { VscSend, VscTrash, VscCloudDownload, VscDebugStop, VscChatSparkle } from 'react-icons/vsc';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import ChatMessageBubble from '../components/ChatMessageBubble';
+import ThoughtBlock from '../components/ThoughtBlock';
+import AIProvisionCard from '../components/AIProvisionCard';
 import { useAIStore } from '../store/useAIStore';
 import { useAppStore } from '../store/useAppStore';
-
-const typingAnimation = keyframes`
-  0% { opacity: 0.2; }
-  20% { opacity: 1; }
-  100% { opacity: 0.2; }
-`;
-
-const Dot = styled('span')(({ theme }) => ({
-  animation: `${typingAnimation} 1.4s infinite both`,
-  '&:nth-of-type(2)': { animationDelay: '0.2s' },
-  '&:nth-of-type(3)': { animationDelay: '0.4s' },
-  fontSize: '1.5rem',
-  lineHeight: 0,
-  display: 'inline-block',
-  margin: '0 1px',
-}));
+import { SUGGESTED_QUESTIONS } from '../constants/ai';
+import { parseMessageThoughts } from '../utils/ai';
+import README from '../../../README.md?raw';
 
 export default function AIAssistant() {
   const theme = useTheme();
@@ -53,20 +43,24 @@ export default function AIAssistant() {
     clearChat,
   } = useAIStore();
 
-  const { pageContents } = useAppStore();
+  const { pageContents, isMobile } = useAppStore();
 
-  // Synthesize Home page context since it's not a markdown file
-  const homePageContext = `FILE: Home Page (index)\nCONTENT:\nName: Steven Gao\nTitle: Software Engineer, UI/UX 📍 San Francisco\nLinks: GitHub (https://github.com/stxgao), LinkedIn (https://www.linkedin.com/in/stxgao/), Email (steven@stevengao.dev), Resume (steven_gao_resume.pdf)`;
-
-  // Aggregate all preloaded markdown content to provide as context
-  const portfolioContext = [
-    homePageContext,
-    ...Object.entries(pageContents).map(([name, content]) => `FILE: ${name}\nCONTENT:\n${content}`),
-  ].join('\n\n---\n\n');
+  // Aggregate all preloaded markdown content to provide as context in XML format
+  const portfolioContext = useMemo(
+    () =>
+      [
+        `<document name="home.md">\nCONTENT:\nName: Steven Gao\nTitle: Software Engineer, UI/UX 📍 San Francisco\nLinks: GitHub (https://github.com/stxgao), LinkedIn (https://www.linkedin.com/in/stxgao/), Email (steven@stevengao.dev), Resume (steven_gao_resume.pdf)\n</document>`,
+        ...Object.entries(pageContents).map(
+          ([name, content]) => `<document name="${name}">\nCONTENT:\n${content}\n</document>`,
+        ),
+        `<document name="README.md">\nCONTENT:\n${README}\n</document>`,
+      ].join('\n\n'),
+    [pageContents],
+  );
 
   useEffect(() => {
-    initAI();
-  }, [initAI]);
+    initAI(isMobile);
+  }, [initAI, isMobile]);
 
   const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
     messagesEndRef.current?.scrollIntoView({ behavior });
@@ -75,14 +69,14 @@ export default function AIAssistant() {
   const handleScroll = () => {
     if (!scrollContainerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
-    // Check if user is within 50px of the bottom
-    const atBottom = scrollHeight - scrollTop - clientHeight < 50;
+    // Check if user is within 100px of the bottom
+    const atBottom = scrollHeight - scrollTop - clientHeight < 100;
     isAtBottomRef.current = atBottom;
   };
 
   useEffect(() => {
     if (isAtBottomRef.current) {
-      scrollToBottom();
+      scrollToBottom(isGenerating || isThinking ? 'auto' : 'smooth');
     }
   }, [messages, isGenerating, isThinking, aiStatus, downloadProgress]);
 
@@ -94,6 +88,12 @@ export default function AIAssistant() {
       handleSend(input, portfolioContext);
       setInput('');
     }
+  };
+
+  const handleSuggestedQuestion = (q: string) => {
+    if (isGenerating || aiStatus !== 'available') return;
+    isAtBottomRef.current = true;
+    handleSend(q, portfolioContext);
   };
 
   const onExport = () => {
@@ -182,6 +182,7 @@ export default function AIAssistant() {
           sx={{
             flexGrow: 1,
             overflowY: 'auto',
+            scrollbarGutter: 'stable',
             px: 3,
             display: 'flex',
             flexDirection: 'column',
@@ -189,13 +190,55 @@ export default function AIAssistant() {
             pb: 2,
           }}
         >
-          {messages.map((msg, idx) => (
-            <ChatMessageBubble
-              key={msg.id || idx}
-              role={msg.role}
-              content={msg.content.trimEnd()}
-            />
-          ))}
+          {messages.map((msg, idx) => {
+            const isLastMessage = idx === messages.length - 1;
+            const { thought, cleanContent, isComplete } = parseMessageThoughts(
+              msg.content,
+              msg.role,
+              isLastMessage,
+            );
+
+            return (
+              <Box
+                key={msg.id || idx}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 0.5,
+                  alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                }}
+              >
+                {/* 
+                  When a thought is present for the assistant, 
+                  we render the label ABOVE the thought block.
+                */}
+                {msg.role === 'assistant' && thought !== null && (
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary', display: 'block', px: 1 }}
+                  >
+                    AI Assistant
+                  </Typography>
+                )}
+
+                {thought !== null && (
+                  <ThoughtBlock
+                    thought={thought}
+                    isComplete={isComplete}
+                    forceExpand={isLastMessage && !isComplete}
+                  />
+                )}
+
+                {cleanContent !== null && (
+                  <ChatMessageBubble
+                    role={msg.role}
+                    content={cleanContent}
+                    hideLabel={msg.role === 'assistant' && thought !== null}
+                  />
+                )}
+              </Box>
+            );
+          })}
           {aiStatus === 'downloading' && (
             <ChatMessageBubble role="assistant">
               <Typography variant="body2" sx={{ mb: 1 }}>
@@ -212,15 +255,6 @@ export default function AIAssistant() {
               >
                 {downloadProgress > 0 ? `${Math.round(downloadProgress)}%` : 'Starting...'}
               </Typography>
-            </ChatMessageBubble>
-          )}
-          {isThinking && (
-            <ChatMessageBubble role="assistant">
-              <Box sx={{ display: 'flex', alignItems: 'center', height: 20, py: 1 }}>
-                <Dot>.</Dot>
-                <Dot>.</Dot>
-                <Dot>.</Dot>
-              </Box>
             </ChatMessageBubble>
           )}
           <div ref={messagesEndRef} />
@@ -244,25 +278,33 @@ export default function AIAssistant() {
       {/* Input Area */}
       {aiStatus === 'downloadable' ? (
         <Box sx={{ p: 2, pt: 0, bgcolor: 'background.paper', flexShrink: 0 }}>
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={() => handleDownload(portfolioContext)}
-            sx={{
-              bgcolor: 'primary.main',
-              color: 'background.default',
-              textTransform: 'none',
-              fontWeight: 600,
-              '&:hover': {
-                bgcolor: 'text.active',
-              },
-            }}
-          >
-            Download Gemini Nano (~1.5GB)
-          </Button>
+          <AIProvisionCard onDownload={() => handleDownload(portfolioContext)} />
         </Box>
       ) : (
         <Box sx={{ p: 2, pt: 0, bgcolor: 'background.paper', flexShrink: 0 }}>
+          {messages.length === 1 && aiStatus === 'available' && (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1.5 }}>
+              {SUGGESTED_QUESTIONS.map((q, idx) => (
+                <Chip
+                  key={idx}
+                  label={q}
+                  onClick={() => handleSuggestedQuestion(q)}
+                  clickable
+                  size="small"
+                  sx={{
+                    bgcolor: 'background.default',
+                    color: 'text.secondary',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'text.primary',
+                    },
+                  }}
+                />
+              ))}
+            </Box>
+          )}
           <TextField
             fullWidth
             size="small"
@@ -284,9 +326,10 @@ export default function AIAssistant() {
                   onClick={onSend}
                   disabled={(!input.trim() && !isGenerating) || aiStatus !== 'available'}
                   sx={{
-                    color: 'markdownIcon',
+                    color: input.trim() || isGenerating ? 'primary.main' : 'text.secondary',
                     '&.Mui-disabled': {
                       color: 'text.secondary',
+                      opacity: 0.3,
                     },
                   }}
                 >
@@ -303,12 +346,14 @@ export default function AIAssistant() {
                 p: 1.5,
                 '& fieldset': {
                   borderColor: 'divider',
+                  transition: 'border-color 0.2s ease',
                 },
                 '&:hover fieldset': {
-                  borderColor: 'text.secondary',
+                  borderColor: 'divider',
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: 'text.primary',
+                  borderColor: 'primary.main',
+                  borderWidth: '1px',
                 },
                 '&.Mui-disabled': {
                   opacity: 0.6,
